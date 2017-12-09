@@ -6,7 +6,7 @@
 #include <nmlmsg.hh>
 
 enum FL_TASK_MODE_ENUM {
- _ FL_TASK_MODE_MANUAL = 1,
+  FL_TASK_MODE_MANUAL = 1,
   FL_TASK_MODE_AUTO = 2,
   FL_TASK_MODE_MDI = 3
 };
