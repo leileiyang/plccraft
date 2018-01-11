@@ -2,19 +2,18 @@
 #define GAS_H_
 
 #include "GasCfg.h"
-
-#include <vector>
-
-#define LAYER_NUM 18
-
-class GasInterface;
+#include "GasInterface.h"
 
 class Gas {
  public:
   Gas();
-  virtual int Open(int layer, int gas_kind);
-  virtual int Close(int layer, int gas_kind);
-  virtual int SetPressure(int layer, int gas_kind);
+  virtual ~Gas();
+  virtual int Open(int layer, int craft_level);
+  virtual int Close(int layer, int craft_level);
+  virtual int SetPressure(int layer, int craft_level);
+  virtual void Update();
+  
+  PLC_STATUS status_;
 
  private:
   std::vector<GasCfg> gas_cfg_;

@@ -1,0 +1,1 @@
+Program('ne_puma', ['ne_linuxcnc_ui_puma.cc', 'shcom.cc'], LIBS=['rt', 'm', 'nml', 'linuxcncini', 'linuxcnc'], CPPPATH=['/usr/include/linuxcnc', '.'])

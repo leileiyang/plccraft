@@ -31,3 +31,8 @@ bool GasInterface::SetPressure(GasType gas_type, double pressure) {
 
   return true;
 }
+
+
+void GasInterface::Update(PLC_STATUS status) {
+  status = PLC_DONE;
+}
