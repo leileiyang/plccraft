@@ -4,7 +4,7 @@
 #include <map>
 #include <string>
 
-#include "../../FlBaseCfg.h"
+#include "../../fl/FlBaseCfg.h"
 
 class GasInterface {
  public:
@@ -12,6 +12,7 @@ class GasInterface {
   virtual bool Close(GasType gas_type);
   virtual bool SetPressure(GasType gas_type, double pressure);
   virtual void Update(PLC_STATUS status);
+  virtual void Close();
 
   static std::map<GasType, std::string> gas_items_;
   static std::map<GasType, std::string> CreateGasItems();

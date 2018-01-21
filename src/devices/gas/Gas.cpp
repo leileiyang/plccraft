@@ -46,3 +46,8 @@ int Gas::SetPressure(int layer, int craft_level) {
 void Gas::Update() {
   gas_intf_->Update(status_);
 }
+
+void Gas::Close() {
+  gas_intf_->Close();
+  status_ = PLC_DONE;
+}

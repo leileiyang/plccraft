@@ -1,7 +1,7 @@
 #ifndef GASCFG_H_
 #define GASCFG_H_
 
-#include "../../FlBaseCfg.h"
+#include "../../fl/FlBaseCfg.h"
 #include <vector>
 
 class GasCfg {

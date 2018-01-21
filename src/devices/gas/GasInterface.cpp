@@ -36,3 +36,7 @@ bool GasInterface::SetPressure(GasType gas_type, double pressure) {
 void GasInterface::Update(PLC_STATUS status) {
   status = PLC_DONE;
 }
+
+void GasInterface::Close() {
+  std::cout << "Close the gas device." << std::endl;
+}

@@ -1,7 +1,7 @@
 #ifndef FOLLOWERCFG_H_
 #define FOLLOWERCFG_H_
 
-#include "../../FlBaseCfg.h"
+#include "../../fl/FlBaseCfg.h"
 #include <vector>
 
 class FollowerCfg {
