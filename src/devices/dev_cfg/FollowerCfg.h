@@ -1,8 +1,10 @@
 #ifndef FOLLOWERCFG_H_
 #define FOLLOWERCFG_H_
 
-#include "../../FlBaseCfg.h"
+#include "../../fl/FlBaseCfg.h"
 #include <vector>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
 
 class FollowerCfg {
  public:
@@ -15,5 +17,19 @@ class FollowerCfg {
   double lift_height_;
 
 };
+
+namespace boost {
+namespace serialization {
+
+template <class Archive>
+void serialize(Archive &ar, FollowerCfg &cfg, const unsigned int version) {
+  ar & cfg.height_;
+  ar & cfg.incr_enable_;
+  ar & incr_time_;
+  ar & lift_height_;
+}
+
+}
+}
 
 #endif

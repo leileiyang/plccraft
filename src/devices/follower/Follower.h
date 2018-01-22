@@ -1,7 +1,7 @@
 #ifndef FOLLOWER_H_
 #define FOLLOWER_H_
 
-#include "FollowerCfg.h"
+#include "../dev_cfg/FollowerCfg.h"
 #include "FLhcInterface.h"
 
 class Follower {

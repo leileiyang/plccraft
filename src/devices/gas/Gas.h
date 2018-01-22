@@ -1,7 +1,7 @@
 #ifndef GAS_H_
 #define GAS_H_
 
-#include "GasCfg.h"
+#include "../dev_cfg/GasCfg.h"
 #include "GasInterface.h"
 
 class Gas {
@@ -12,7 +12,7 @@ class Gas {
   virtual int Close(int layer, int craft_level);
   virtual int SetPressure(int layer, int craft_level);
   virtual void Update();
-  
+
   PLC_STATUS status_;
 
  private:
