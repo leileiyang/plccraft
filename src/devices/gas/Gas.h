@@ -4,6 +4,8 @@
 #include "../dev_cfg/GasCfg.h"
 #include "GasInterface.h"
 
+class DeviceCfg;
+
 class Gas {
  public:
   Gas();
@@ -14,6 +16,8 @@ class Gas {
   virtual void Update();
 
   PLC_STATUS status_;
+
+  friend class DeviceCfg;
 
  private:
   std::vector<GasCfg> gas_cfg_;
