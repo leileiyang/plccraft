@@ -4,7 +4,7 @@
 #include <map>
 #include <string>
 
-#include "../../FlBaseCfg.h"
+#include "../../fl/FlBaseCfg.h"
 
 class GasInterface {
  public:
