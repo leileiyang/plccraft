@@ -1,25 +1,13 @@
+#include "DeviceCfg.h"
+
 #include "../gas/Gas.h"
+#include "../follower/Follower.h"
+
 #include <zmq.h>
 #include <sstream>
 #include <string>
 #include <cstdlib>
 
-class DeviceCfg {
- public:
-  DeviceCfg();
-  ~DeviceCfg();
-  int InitCfgSocket();
-  int UpdateGasCfg(Gas &gas);
-
- private:
-  void *gas_subscriber_;
-  void *lhc_subscriber_;
-  void *context_;
-
-  int ZmqRecvx(void *socket, std::string &identify, std::string &layer,
-      std::string &content); 
-
-};
 
 DeviceCfg::DeviceCfg(): gas_subscriber_(NULL), lhc_subscriber_(NULL),
     context_(NULL) {}
@@ -42,6 +30,10 @@ int DeviceCfg::InitCfgSocket() {
   zmq_connect(lhc_subscriber_, "tcp://localhost:6001");
   zmq_setsockopt(gas_subscriber_, ZMQ_SUBSCRIBE, "LHC", strlen("LHC"));
 
+  if (gas_subscriber_ && lhc_subscriber_) {
+    return 0;
+  }
+  return -1;
 }
 
 int DeviceCfg::ZmqRecvx(void *socket, std::string &identity, std::string &layer,
@@ -89,6 +81,26 @@ int DeviceCfg::UpdateGasCfg(Gas &gas) {
     assert(layer < gas.gas_cfg_.size());
     ia >> gas.gas_cfg_[layer];
     gas.gas_cfg_[layer].show();
+  } else if (rc < 0) {
+    return -1;
+  }
+  return 0;
+}
+
+int DeviceCfg::UpdateFollowerCfg(Follower &follower) {
+  std::string identity;
+  std::string layer_str;
+  std::string content;
+
+  int rc = ZmqRecvx(lhc_subscriber_, identity, layer_str, content);
+
+  if (rc == 3) {
+    std::istringstream ifs(content);
+    boost::archive::text_iarchive ia(ifs);
+    int layer = atoi(layer_str.c_str());
+    assert(layer < follower.follower_cfg_.size());
+    ia >> follower.follower_cfg_[layer];
+    follower.follower_cfg_[layer].show();
   } else if (rc < 0) {
     return -1;
   }

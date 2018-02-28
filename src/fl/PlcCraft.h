@@ -5,6 +5,7 @@
 
 #include "devices/gas/Gas.h"
 #include "devices/follower/Follower.h"
+#include "devices/dev_cfg/DeviceCfg.h"
 
 enum PLC_CMD_ENUM {
   // Gas Command
@@ -66,9 +67,11 @@ enum PLC_TASK_EXEC_ENUM {
 class PlcCraft {
  public:
   PlcCraft();
+  bool Initialize();
   void AddCmd(PLC_CMD_ENUM command);
   PLC_STATUS IssueCmd();
   void Update();
+  void UpdateDeviceCfg();
 
   int current_layer_;
   PLC_STATUS status_;
@@ -78,10 +81,11 @@ class PlcCraft {
   PLC_CMD_ENUM cmd_;
   const PLC_CMD_ENUM GetNextCmd();
   const std::size_t GetCmdQueueSize();
-  void DetachLastCmd(); 
+  void DetachLastCmd();
   int DoCmd();
   PLC_TASK_EXEC_ENUM CheckPostCondition();
 
+  DeviceCfg device_cfg_;
   Gas *gas_;
   Follower *follower_;
 

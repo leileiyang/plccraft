@@ -2,8 +2,8 @@
 // FILE : ne_linuxcnc_ui_puma.cc
 //
 // DESC :
-//     A demo LinuxCNC UI that accepts MDI commands from stdin and sends  
-//     them to LinuxCNC. It is meant to serve as a template for implementing 
+//     A demo LinuxCNC UI that accepts MDI commands from stdin and sends
+//     them to LinuxCNC. It is meant to serve as a template for implementing
 //     a LinuxCNC interface that supports MDI command streaming from some
 //     external program.
 //
@@ -13,7 +13,7 @@
 //
 // NOTES:
 //     This code is a skeletal port of an older version and, therefore, might
-//     contain some unused code or be quite delicate. Take the liberty of 
+//     contain some unused code or be quite delicate. Take the liberty of
 //     making your own enhancements.
 //
 //     This rudimentary UI program is a prodigal cross-breed of:
@@ -58,7 +58,7 @@ extern "C" {
 #include <fcntl.h>
 #include <math.h>		// lrint(3)
 #include <ctype.h>
-// select(3) 
+// select(3)
 #include <sys/select.h>
 #include <assert.h>
 #include <sys/signalfd.h>
@@ -76,6 +76,8 @@ extern "C" {
 #include <sstream>
 #include <iterator>
 #include <vector>
+
+#include "fl/PlcCraft.h"
 
 // a "few" globals to control emc status printout
     static int status_mode = STAT_MODE_STDOUT;
@@ -115,7 +117,7 @@ static int task_state = 0;
 //#define UI_EMC_INTERP_BUSY   1
 typedef enum {
   UI_EMC_INTERP_ERROR = -1,
-  UI_EMC_INTERP_IDLE = 0, 
+  UI_EMC_INTERP_IDLE = 0,
   UI_EMC_INTERP_BUSY = 1,
   UI_EMC_INTERP_PAUSED = 2
 } UI_EMC_INTERP_STATE;
@@ -143,9 +145,11 @@ static POS_DISPLAY_TYPE posDisplay = POS_DISPLAY_ACT;
 
 //////////////////////////////////////////////////////////////////////////////
 //
-// Custom Functions 
+// Custom Functions
 //
 //////////////////////////////////////////////////////////////////////////////
+
+PlcCraft plc_craft;
 
 typedef enum {
   EMC_TASK_ERROR = -1,
@@ -167,6 +171,8 @@ std::vector<std::string> StringSplit(const char *str) {
 int FlTaskCommand(const char *commandbuf) {
   std::vector<std::string> words = StringSplit(commandbuf);
   if (words.empty()) {
+    // whether there is a device parameter configure update
+    plc_craft.UpdateDeviceCfg();
     return 0;
   } else {
     int ret = 0;
@@ -261,7 +267,7 @@ static char *upcase(char *string)
 //////////////////////////////////////////////////////////////////////////////
 
 // Func : shm_init
-// Desc : creates posix shm file for status info IPC; meant for use with an 
+// Desc : creates posix shm file for status info IPC; meant for use with an
 //        external prog streaming in MDI cmds.
 static void *shm_init(const char *const filename, size_t filesize)
 {
@@ -307,7 +313,7 @@ static int do_updateStatus(void)
 }
 
 // Func : do_updateError
-// Desc : read NML channel for LinuxCNC error messages 
+// Desc : read NML channel for LinuxCNC error messages
 static int do_updateError(void)
 {
 	int ret = -1;
@@ -316,7 +322,7 @@ static int do_updateError(void)
 	// `NML_ERROR_LEN` defined in `include/nml_io.h`
 	memset(error_string, 0, NML_ERROR_LEN);
 
-	ret = updateError(); // defined in `src/emc/usr_intf/shcom.cc` 
+	ret = updateError(); // defined in `src/emc/usr_intf/shcom.cc`
 	if (ret < 0) {
 		prerr("updateError()\n");
 		goto exit;
@@ -339,7 +345,7 @@ static int get_state(void)
 {
 	int ret;
 
-	// obtain a "snapshot" of LinuxCNC status 
+	// obtain a "snapshot" of LinuxCNC status
 	if ((ret = do_updateStatus()) < 0)
 		return ret;
 
@@ -557,7 +563,7 @@ static int set_runtmeStatusStr(void)
 	//       "axis[i].output" means joint position
 	//
 	x = emcStatus->motion.axis[0].input;	// or ".output"
-	... ... ... ... ... ... 
+	... ... ... ... ... ...
 	c = emcStatus->motion.axis[5].input;	// or ".output"
 #endif
 
@@ -846,7 +852,7 @@ static void ui_printStatusStr(void)
 	default:		// this should never happen
 		prerr("Illegal UI status_mode\n");
 		abort();
-	}			// switch(status_mode) 
+	}			// switch(status_mode)
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -897,7 +903,7 @@ int main(int argc, char **argv)
 			// copy to LinuxCNC global emc_inifile array
 			memset(emc_inifile, 0, LINELEN);
 			strncpy(emc_inifile, argv[optind], LINELEN - 1);
-			//  a simple check if file exists 
+			//  a simple check if file exists
 			if (open(emc_inifile, O_RDONLY) == -1) {
 				prerr(" \"%s\" ; %s\n", emc_inifile,
 				      strerror(errno));
@@ -914,7 +920,7 @@ int main(int argc, char **argv)
 			// copy to LinuxCNC global emc_nmlfile array
 			memset(emc_nmlfile, 0, LINELEN);
 			strncpy(emc_nmlfile, argv[optind], LINELEN - 1);
-			//  a simple check if file exists 
+			//  a simple check if file exists
 			if (open(emc_nmlfile, O_RDONLY) == -1) {
 				prerr(" \"%s\" ; %s\n", emc_nmlfile,
 				      strerror(errno));
@@ -932,7 +938,7 @@ int main(int argc, char **argv)
 			}
 			switch (atoi(argv[optind])) {
 			case STAT_MODE_SHMEM:
-				status_mode = STAT_MODE_SHMEM;	// copy to shm 
+				status_mode = STAT_MODE_SHMEM;	// copy to shm
 				status_mmap =
 				    shm_init(UI_EMC_SHM, sizeof(uiEmcStatus));
 				if (!status_mmap)
@@ -1073,7 +1079,7 @@ int main(int argc, char **argv)
 		struct timeval to;
 		static long pcntr = NML_STAT_ERR_DISPLAY_CNTR;
 
-		ret = get_interpState();	// "peek" NML channels for status & error 
+		ret = get_interpState();	// "peek" NML channels for status & error
 		switch (ret) {
 
 		case UI_EMC_INTERP_ERROR:
@@ -1101,7 +1107,7 @@ int main(int argc, char **argv)
       } else {
         PRINT_UI(status_mode, ">> PLC Craft...\n");
         usleep(NML_STAT_ERR_UPDATE_CYCLE);
-        sendProgramResume(); 
+        sendProgramResume();
         continue;
       }
 		case UI_EMC_INTERP_IDLE:	// check for new MDI command from operator
