@@ -21,3 +21,7 @@ bool FLhcInterface::LiftTo(double height) {
 void FLhcInterface::Update(PLC_STATUS &status) {
   status = PLC_DONE;
 }
+
+void FLhcInterface::Close() {
+  std::cout << "Close the follower device." << std::endl;
+}

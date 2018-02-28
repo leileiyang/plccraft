@@ -2,7 +2,7 @@
 #define FLHCINTERFACE_H_
 
 #include <string>
-#include "../../FlBaseCfg.h"
+#include "../../fl/FlBaseCfg.h"
 
 class FLhcInterface {
  public:
@@ -10,6 +10,7 @@ class FLhcInterface {
   virtual bool IncrFollowTo(double height, double time);
   virtual bool LiftTo(double height);
   virtual void Update(PLC_STATUS &status);
+  virtual void Close();
 
 };
 

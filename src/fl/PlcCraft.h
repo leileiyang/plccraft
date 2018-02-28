@@ -8,6 +8,8 @@
 #include "devices/dev_cfg/DeviceCfg.h"
 
 enum PLC_CMD_ENUM {
+  // 
+  PLC_CMD_NONE = 0,
   // Gas Command
   OPEN_CUTTING_GAS = 100,
   OPEN_FIRST_GAS = 101,
@@ -72,11 +74,15 @@ class PlcCraft {
   PLC_STATUS IssueCmd();
   void Update();
   void UpdateDeviceCfg();
+  void LoadCraft(int craft_layer);
+  PLC_STATUS Execute();
 
-  int current_layer_;
+  int craft_layer_;
   PLC_STATUS status_;
+  PLC_TASK_EXEC_ENUM exec_state_; 
 
  private:
+  int execute_error_;
   std::queue<PLC_CMD_ENUM> cmds_;
   PLC_CMD_ENUM cmd_;
   const PLC_CMD_ENUM GetNextCmd();
@@ -84,6 +90,7 @@ class PlcCraft {
   void DetachLastCmd();
   int DoCmd();
   PLC_TASK_EXEC_ENUM CheckPostCondition();
+  void TaskAbort();
 
   DeviceCfg device_cfg_;
   Gas *gas_;

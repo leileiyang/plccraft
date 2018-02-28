@@ -72,6 +72,7 @@ extern "C" {
 #include "emccfg.h"		// DEFAULT_TRAJ_MAX_VELOCITY
 #include "shcom.hh"		// EMC_STAT *emcStatus, char error_string[]
 
+// FlTask headers
 #include <string>
 #include <sstream>
 #include <iterator>
@@ -79,13 +80,15 @@ extern "C" {
 
 #include "fl/PlcCraft.h"
 
+
 // a "few" globals to control emc status printout
-    static int status_mode = STAT_MODE_STDOUT;
+static int status_mode = STAT_MODE_STDOUT;
 static void *status_mmap = NULL;
 static char status_str[STAT_STR_LEN];
 static int print_status_str = 1;	// if non-zero, allow printing "status_str[]"
 static int cmd_prompt_shown = 0;	// if non-zero, cmd prompt was already displayed
 static int task_state = 0;
+static PlcCraft plc_craft; 
 
 // show status string header; enable printing global "status_str[]"
 #define PRINT_STAT_STR_PREP(mode) do { \
@@ -145,7 +148,7 @@ static POS_DISPLAY_TYPE posDisplay = POS_DISPLAY_ACT;
 
 //////////////////////////////////////////////////////////////////////////////
 //
-// Custom Functions
+// FlTask Functions 
 //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -155,7 +158,8 @@ typedef enum {
   EMC_TASK_ERROR = -1,
   EMC_TASK_IDLE,
   EMC_TASK_BUSY,
-  EMC_TASK_PAUSED
+  EMC_TASK_PAUSED,
+  EMC_TASK_WAITING_FOR_PLC
 } EMC_TASK_STATE;
 
 std::vector<std::string> StringSplit(const char *str) {
@@ -166,6 +170,14 @@ std::vector<std::string> StringSplit(const char *str) {
       std::istream_iterator<std::string>(), std::back_inserter(tokens));
 
   return tokens;
+}
+
+int PlcCraftJob(int line) {
+  // 1. find the M07 from the given line
+  // 2. extract the craft layer
+  int craft_layer = 0;
+  // 3. send the craft layer to plc craft module
+  plc_craft.LoadCraft(craft_layer);
 }
 
 int FlTaskCommand(const char *commandbuf) {
@@ -1104,10 +1116,22 @@ int main(int argc, char **argv)
 			continue;
     case UI_EMC_INTERP_PAUSED: // interp paused in auto mode
       if (task_state == EMC_TASK_PAUSED) {
-      } else {
-        PRINT_UI(status_mode, ">> PLC Craft...\n");
-        usleep(NML_STAT_ERR_UPDATE_CYCLE);
-        sendProgramResume();
+        // paused by external prog
+        ;
+      } else { // paused by internal M0
+        if (task_state == EMC_TASK_BUSY) {
+          PRINT_UI(status_mode, ">> PLC Craft...\n");
+          PlcCraftJob(emcStatus->task.motionLine);
+          task_state = EMC_TASK_WAITING_FOR_PLC;
+        } else if (task_state == EMC_TASK_WAITING_FOR_PLC) { 
+          ret = plc_craft.Execute();
+          if (ret == PLC_DONE) {
+            FlTaskCommand("c resume");
+          } else if (ret == PLC_ERROR) {
+            prerr("Plc Craft Error!\n");
+            goto exit;
+          }
+        }
         continue;
       }
 		case UI_EMC_INTERP_IDLE:	// check for new MDI command from operator

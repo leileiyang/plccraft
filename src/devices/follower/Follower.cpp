@@ -55,3 +55,8 @@ int Follower::LiftTo(int layer) {
 void Follower::Update() {
   flhc_intf_->Update(status_);
 }
+
+void Follower::Close() {
+  flhc_intf_->Close();
+  status_ = PLC_DONE;
+}

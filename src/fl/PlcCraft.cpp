@@ -1,6 +1,8 @@
 #include "PlcCraft.h"
 
-PlcCraft::PlcCraft() {
+PlcCraft::PlcCraft(): craft_layer_(0), status_(PLC_DONE),
+    exec_state_(PLC_TASK_EXEC_DONE), execute_error_(0) {
+
   gas_ = new Gas;
   follower_ = new Follower;
 }
@@ -10,6 +12,48 @@ bool PlcCraft::Initialize() {
     return false;
   }
   return true;
+}
+
+void PlcCraft::LoadCraft(int craft_layer) {
+  execute_error_ = 0;
+  craft_layer_ = craft_layer;
+}
+
+void PlcCraft::TaskAbort() {
+  cmd_ = PLC_CMD_NONE;
+  cmds_ = std::queue<PLC_CMD_ENUM>();
+  exec_state_ = PLC_TASK_EXEC_DONE;
+  execute_error_ = 0;
+  follower_->Close();
+  gas_->Close();
+}
+
+PLC_STATUS PlcCraft::Execute() {
+  switch (exec_state_) {
+    case PLC_TASK_EXEC_DONE:
+      IssueCmd();
+      break;
+    case PLC_TASK_EXEC_ERROR:
+      TaskAbort();
+      break;
+    case PLC_TASK_EXEC_WAITING_FOR_LHC:
+      if (follower_->status_ == PLC_ERROR) {
+        exec_state_ = PLC_TASK_EXEC_ERROR;
+      } else if (follower_->status_ == PLC_DONE) {
+        exec_state_ = PLC_TASK_EXEC_DONE;
+      }
+      break;
+    case PLC_TASK_EXEC_WAITING_FOR_GAS:
+      if (gas_->status_ == PLC_ERROR) {
+        exec_state_ = PLC_TASK_EXEC_ERROR;
+      } else if (gas_->status_ == PLC_DONE) {
+        exec_state_ = PLC_TASK_EXEC_DONE;
+      }
+    default:
+      break;
+  }
+  Update();
+  return status_;
 }
 
 void PlcCraft::AddCmd(PLC_CMD_ENUM command) {
@@ -30,9 +74,11 @@ const std::size_t PlcCraft::GetCmdQueueSize() {
 
 PLC_STATUS PlcCraft::IssueCmd() {
   if (DoCmd() != 0) {
+    execute_error_ = 1;
     return PLC_ERROR;
   }
-  if (CheckPostCondition() == PLC_TASK_EXEC_DONE) {
+  exec_state_ = CheckPostCondition(); 
+  if (exec_state_ == PLC_TASK_EXEC_DONE) {
     return PLC_DONE;
   } else {
     return PLC_EXEC;
@@ -59,63 +105,63 @@ int PlcCraft::DoCmd() {
     switch (cmd_) {
       // Gas Command
       case OPEN_CUTTING_GAS:
-        retval = gas_->Open(current_layer_, CRAFT_CUTTING);
+        retval = gas_->Open(craft_layer_, CRAFT_CUTTING); 
         break;
       case OPEN_FIRST_GAS:
-        retval = gas_->Open(current_layer_, CRAFT_FIRST);
+        retval = gas_->Open(craft_layer_, CRAFT_FIRST); 
         break;
       case OPEN_SECOND_GAS:
-        retval = gas_->Open(current_layer_, CRAFT_SECOND);
+        retval = gas_->Open(craft_layer_, CRAFT_SECOND); 
         break;
       case OPEN_THIRD_GAS:
-        retval = gas_->Open(current_layer_, CRAFT_THIRD);
+        retval = gas_->Open(craft_layer_, CRAFT_THIRD); 
         break;
       case CLOSE_CUTTING_GAS:
-        retval = gas_->Close(current_layer_, CRAFT_CUTTING);
+        retval = gas_->Close(craft_layer_, CRAFT_CUTTING); 
         break;
       case CLOSE_FIRST_GAS:
-        retval = gas_->Close(current_layer_, CRAFT_FIRST);
+        retval = gas_->Close(craft_layer_, CRAFT_FIRST); 
         break;
       case CLOSE_SECOND_GAS:
-        retval = gas_->Close(current_layer_, CRAFT_SECOND);
+        retval = gas_->Close(craft_layer_, CRAFT_SECOND); 
         break;
       case CLOSE_THIRD_GAS:
-        retval = gas_->Close(current_layer_, CRAFT_THIRD);
+        retval = gas_->Close(craft_layer_, CRAFT_THIRD); 
         break;
       case SET_CUTTING_PRESSURE:
-        retval = gas_->SetPressure(current_layer_, CRAFT_CUTTING);
+        retval = gas_->SetPressure(craft_layer_, CRAFT_CUTTING); 
         break;
       case SET_FIRST_PRESSURE:
-        retval = gas_->SetPressure(current_layer_, CRAFT_FIRST);
+        retval = gas_->SetPressure(craft_layer_, CRAFT_FIRST); 
         break;
       case SET_SECOND_PRESSURE:
-        retval = gas_->SetPressure(current_layer_, CRAFT_SECOND);
+        retval = gas_->SetPressure(craft_layer_, CRAFT_SECOND); 
         break;
       case SET_THIRD_PRESSURE:
-        retval = gas_->SetPressure(current_layer_, CRAFT_THIRD);
+        retval = gas_->SetPressure(craft_layer_, CRAFT_THIRD); 
         break;
 
         // Follower Command
       case FOLLOW_CUTTING_HEIGHT:
-        retval = follower_->FollowTo(current_layer_, CRAFT_CUTTING);
+        retval = follower_->FollowTo(craft_layer_, CRAFT_CUTTING);
         break;
       case FOLLOW_FIRST_HEIGHT:
-        retval = follower_->FollowTo(current_layer_, CRAFT_FIRST);
+        retval = follower_->FollowTo(craft_layer_, CRAFT_FIRST);
         break;
       case FOLLOW_SECOND_HEIGHT:
-        retval = follower_->FollowTo(current_layer_, CRAFT_SECOND);
+        retval = follower_->FollowTo(craft_layer_, CRAFT_SECOND);
         break;
       case FOLLOW_THIRD_HEIGHT:
-        retval = follower_->FollowTo(current_layer_, CRAFT_THIRD);
+        retval = follower_->FollowTo(craft_layer_, CRAFT_THIRD);
         break;
-      case FIRST_PROGRESSIVE:
-        retval = follower_->IncrFollowTo(current_layer_, CRAFT_FIRST);
+      case FIRST_PROGRESSIVE: 
+        retval = follower_->IncrFollowTo(craft_layer_, CRAFT_FIRST);
         break;
       case SECOND_PROGRESSIVE:
-        retval = follower_->IncrFollowTo(current_layer_, CRAFT_SECOND);
+        retval = follower_->IncrFollowTo(craft_layer_, CRAFT_SECOND);
         break;
       case THRED_PROGRESSIVE:
-        retval = follower_->IncrFollowTo(current_layer_, CRAFT_THIRD);
+        retval = follower_->IncrFollowTo(craft_layer_, CRAFT_THIRD);
         break;
 
       default:
@@ -133,13 +179,14 @@ void PlcCraft::Update() {
   follower_->Update();
   // Update Laser
 
-  if (gas_->status_ == PLC_ERROR || \
+  if (execute_error_ || gas_->status_ == PLC_ERROR || \
       follower_->status_ == PLC_ERROR) {
 
     status_ = PLC_ERROR;
-  } else if (gas_->status_ == PLC_DONE && \
-      follower_->status_ == PLC_DONE) {
-
+  } else if (!execute_error_ && gas_->status_ == PLC_DONE && \
+      follower_->status_ == PLC_DONE && \
+      GetCmdQueueSize() == 0) {
+    
     status_ = PLC_DONE;
   } else {
     status_ = PLC_EXEC;

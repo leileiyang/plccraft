@@ -15,6 +15,7 @@ class Gas {
   virtual int SetPressure(int layer, int craft_level);
   virtual void Update();
 
+  virtual void Close();
   PLC_STATUS status_;
 
   friend class DeviceCfg;

@@ -12,6 +12,7 @@ class Follower {
   virtual int IncrFollowTo(int layer, int craft_level);
   virtual int LiftTo(int layer);
   virtual void Update();
+  virtual void Close();
 
   PLC_STATUS status_;
 
