@@ -194,6 +194,6 @@ void PlcCraft::Update() {
 }
 
 void PlcCraft::UpdateDeviceCfg() {
-  device_cfg_.UpdateGasCfg(gas_);
-  device_cfg_.UpdateFollowerCfg(follower_);
+  device_cfg_.UpdateGasCfg(*gas_);
+  device_cfg_.UpdateFollowerCfg(*follower_);
 }

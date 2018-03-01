@@ -25,8 +25,8 @@ template <class Archive>
 void serialize(Archive &ar, FollowerCfg &cfg, const unsigned int version) {
   ar & cfg.height_;
   ar & cfg.incr_enable_;
-  ar & incr_time_;
-  ar & lift_height_;
+  ar & cfg.incr_time_;
+  ar & cfg.lift_height_;
 }
 
 }

@@ -5,8 +5,8 @@
 
 #include <zmq.h>
 #include <sstream>
-#include <string>
 #include <cstdlib>
+#include <cstring>
 
 
 DeviceCfg::DeviceCfg(): gas_subscriber_(NULL), lhc_subscriber_(NULL),
@@ -100,7 +100,7 @@ int DeviceCfg::UpdateFollowerCfg(Follower &follower) {
     int layer = atoi(layer_str.c_str());
     assert(layer < follower.follower_cfg_.size());
     ia >> follower.follower_cfg_[layer];
-    follower.follower_cfg_[layer].show();
+    //follower.follower_cfg_[layer].show();
   } else if (rc < 0) {
     return -1;
   }

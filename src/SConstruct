@@ -1,1 +1,14 @@
-Program('ne_puma', ['ne_linuxcnc_ui_puma.cc', 'shcom.cc'], LIBS=['rt', 'm', 'nml', 'linuxcncini', 'linuxcnc'], CPPPATH=['/usr/include/linuxcnc', '.'])
+env = Environment()
+Export('env')
+objs = []
+src_files = Split("""ne_linuxcnc_ui_puma
+                     shcom.cc
+                  """)
+for subdir in ['fl', 'devices']:
+  o = SConscript('%s/SConscript' % subdir)
+  objs.extend(o)
+
+src_files = src_files + objs
+Program('fltask', src_files, 
+        LIBS=['rt', 'm', 'nml', 'linuxcncini', 'linuxcnc', 'boost_serialization', 'zmq'],
+        CPPPATH=['/usr/include/linuxcnc', '.'])

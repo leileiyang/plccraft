@@ -3,9 +3,9 @@
 
 #include <queue>
 
-#include "devices/gas/Gas.h"
-#include "devices/follower/Follower.h"
-#include "devices/dev_cfg/DeviceCfg.h"
+#include "../devices/gas/Gas.h"
+#include "../devices/follower/Follower.h"
+#include "../devices/dev_cfg/DeviceCfg.h"
 
 enum PLC_CMD_ENUM {
   // 

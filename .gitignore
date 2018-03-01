@@ -1,0 +1,6 @@
+src/fl/*.[oa]
+src/*.[oa]
+src/devices/dev_cfg/*.[oa]
+src/devices/follower/*.[oa]
+src/devices/gas/*.[oa]
+*~

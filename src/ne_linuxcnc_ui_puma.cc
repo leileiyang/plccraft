@@ -152,8 +152,6 @@ static POS_DISPLAY_TYPE posDisplay = POS_DISPLAY_ACT;
 //
 //////////////////////////////////////////////////////////////////////////////
 
-PlcCraft plc_craft;
-
 typedef enum {
   EMC_TASK_ERROR = -1,
   EMC_TASK_IDLE,

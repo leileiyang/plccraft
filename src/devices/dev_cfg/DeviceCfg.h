@@ -1,6 +1,8 @@
 #ifndef DEVICECFG_H_
 #define DEVICECFG_H
 
+#include <string>
+
 class Gas;
 class Follower;
 

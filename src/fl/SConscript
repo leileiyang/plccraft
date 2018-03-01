@@ -1,0 +1,4 @@
+Import('env')
+objs = []
+objs.append(env.Object("PlcCraft.cpp"))
+Return('objs')
