@@ -3,6 +3,7 @@
 #include <pthread.h>
 #include <sstream>
 #include <string.h>
+#include <stdio.h>
 
 static void *subscriber_thread(void *ctx) {
   void *subscriber = zmq_socket(ctx, ZMQ_SUB);
@@ -27,7 +28,7 @@ static void *subscriber_thread(void *ctx) {
         boost::archive::text_iarchive ia(ifs);
         GasCfg re_cfg;
         ia >> re_cfg;
-        re_cfg.show();
+        re_cfg.Show();
         count++;
       }
       zmq_msg_close(&part);
@@ -56,19 +57,31 @@ static void *publisher_thread(void *ctx) {
 
 
 
-  while (1) {
+  i = 0;
+  char buff[10];
+  while (i < 5) {
+    // send identity
     zmq_msg_t message;
     zmq_msg_init_size(&message, strlen("GAS"));
     memcpy(zmq_msg_data(&message), "GAS", strlen("GAS"));
     int size = zmq_msg_send(&message, publisher, ZMQ_SNDMORE);
     zmq_msg_close(&message);
-
+    // send layer index
+    //memset(buff, 0, 10); 
+    //sprintf(buff, "%d", i);
+    //zmq_msg_t layer;
+    //zmq_msg_init_size(&layer, strlen(buff));
+    //memcpy(zmq_msg_data(&layer), buff, strlen(buff));
+    //size = zmq_msg_send(&layer, publisher, ZMQ_SNDMORE);
+    //zmq_msg_close(&layer);
+    // send layer parameter
     zmq_msg_t part;
     zmq_msg_init_size(&part, ofs.str().length());
     memcpy(zmq_msg_data(&part), ofs.str().c_str(), ofs.str().length());
     size = zmq_msg_send(&part, publisher, 0);
     zmq_msg_close(&part);
 
+    i++;
     sleep(0.1);
   }
 }
@@ -83,7 +96,6 @@ static void *publisher_thread(void *ctx) {
 //    zframe_destroy(&frame);
 //  }
 //}
-
 int main() {
   void *ctx = zmq_ctx_new();
   pthread_t a;

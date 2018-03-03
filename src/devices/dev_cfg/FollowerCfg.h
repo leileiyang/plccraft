@@ -3,6 +3,7 @@
 
 #include "../../fl/FlBaseCfg.h"
 #include <vector>
+#include <iostream>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 
@@ -15,7 +16,14 @@ class FollowerCfg {
   std::vector<bool> incr_enable_;
   std::vector<double> incr_time_;
   double lift_height_;
-
+  
+  void Show() {
+    for (int i = 0; i < CRAFT_LEVELS; i++) {
+      std::cout << i << "->height:" << height_[i] << " incr_enable:" <<
+        incr_enable_[i] << " incr_time:" << incr_time_[i] << std::endl;
+    }
+    std::cout << "lift height:" << lift_height_ << std::endl;
+  }
 };
 
 namespace boost {

@@ -14,7 +14,7 @@ class GasCfg {
 
   std::vector<GasType> gas_;
   std::vector<double> pressure_;
-  void show() {
+  void Show() {
     for (int i = 0; i < CRAFT_LEVELS; i++) {
       std::cout << gas_[i] << " pressure:" << pressure_[i] << std::endl;
     }

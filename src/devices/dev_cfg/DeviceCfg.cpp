@@ -80,7 +80,7 @@ int DeviceCfg::UpdateGasCfg(Gas &gas) {
     int layer = atoi(layer_str.c_str());
     assert(layer < gas.gas_cfg_.size());
     ia >> gas.gas_cfg_[layer];
-    gas.gas_cfg_[layer].show();
+    gas.gas_cfg_[layer].Show();
   } else if (rc < 0) {
     return -1;
   }
@@ -100,7 +100,7 @@ int DeviceCfg::UpdateFollowerCfg(Follower &follower) {
     int layer = atoi(layer_str.c_str());
     assert(layer < follower.follower_cfg_.size());
     ia >> follower.follower_cfg_[layer];
-    //follower.follower_cfg_[layer].show();
+    follower.follower_cfg_[layer].Show();
   } else if (rc < 0) {
     return -1;
   }

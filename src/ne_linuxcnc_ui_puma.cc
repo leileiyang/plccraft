@@ -170,6 +170,13 @@ std::vector<std::string> StringSplit(const char *str) {
   return tokens;
 }
 
+int FlTaskInit() {
+  if (plc_craft_.Initialize()) {
+    return 0;
+  }
+  return -1;
+}
+
 int PlcCraftJob(int line) {
   // 1. find the M07 from the given line
   // 2. extract the craft layer
@@ -1080,8 +1087,16 @@ int main(int argc, char **argv)
 		prerr("%s\n", strerror(errno));
 		exit(EXIT_FAILURE);
 	}
+
+  // FlTask INIT
+  if (FlTaskInit() != 0) {
+		prerr("FlTask Initialize Failed!\n");
+		exit(EXIT_FAILURE);
+  }
+
 	// main loop : continuously poll LinuxCNC state (status and error)
 	//             while waiting for operator MDI cmd
+
 	for (;;) {
 
 		char cmdbuf[LINELEN];
