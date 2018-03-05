@@ -77,7 +77,7 @@ PLC_STATUS PlcCraft::IssueCmd() {
     execute_error_ = 1;
     return PLC_ERROR;
   }
-  exec_state_ = CheckPostCondition(); 
+  exec_state_ = CheckPostCondition();
   if (exec_state_ == PLC_TASK_EXEC_DONE) {
     return PLC_DONE;
   } else {
@@ -105,40 +105,40 @@ int PlcCraft::DoCmd() {
     switch (cmd_) {
       // Gas Command
       case OPEN_CUTTING_GAS:
-        retval = gas_->Open(craft_layer_, CRAFT_CUTTING); 
+        retval = gas_->Open(craft_layer_, CRAFT_CUTTING);
         break;
       case OPEN_FIRST_GAS:
-        retval = gas_->Open(craft_layer_, CRAFT_FIRST); 
+        retval = gas_->Open(craft_layer_, CRAFT_FIRST);
         break;
       case OPEN_SECOND_GAS:
-        retval = gas_->Open(craft_layer_, CRAFT_SECOND); 
+        retval = gas_->Open(craft_layer_, CRAFT_SECOND);
         break;
       case OPEN_THIRD_GAS:
-        retval = gas_->Open(craft_layer_, CRAFT_THIRD); 
+        retval = gas_->Open(craft_layer_, CRAFT_THIRD);
         break;
       case CLOSE_CUTTING_GAS:
-        retval = gas_->Close(craft_layer_, CRAFT_CUTTING); 
+        retval = gas_->Close(craft_layer_, CRAFT_CUTTING);
         break;
       case CLOSE_FIRST_GAS:
-        retval = gas_->Close(craft_layer_, CRAFT_FIRST); 
+        retval = gas_->Close(craft_layer_, CRAFT_FIRST);
         break;
       case CLOSE_SECOND_GAS:
-        retval = gas_->Close(craft_layer_, CRAFT_SECOND); 
+        retval = gas_->Close(craft_layer_, CRAFT_SECOND);
         break;
       case CLOSE_THIRD_GAS:
-        retval = gas_->Close(craft_layer_, CRAFT_THIRD); 
+        retval = gas_->Close(craft_layer_, CRAFT_THIRD);
         break;
       case SET_CUTTING_PRESSURE:
-        retval = gas_->SetPressure(craft_layer_, CRAFT_CUTTING); 
+        retval = gas_->SetPressure(craft_layer_, CRAFT_CUTTING);
         break;
       case SET_FIRST_PRESSURE:
-        retval = gas_->SetPressure(craft_layer_, CRAFT_FIRST); 
+        retval = gas_->SetPressure(craft_layer_, CRAFT_FIRST);
         break;
       case SET_SECOND_PRESSURE:
-        retval = gas_->SetPressure(craft_layer_, CRAFT_SECOND); 
+        retval = gas_->SetPressure(craft_layer_, CRAFT_SECOND);
         break;
       case SET_THIRD_PRESSURE:
-        retval = gas_->SetPressure(craft_layer_, CRAFT_THIRD); 
+        retval = gas_->SetPressure(craft_layer_, CRAFT_THIRD);
         break;
 
         // Follower Command
@@ -154,7 +154,7 @@ int PlcCraft::DoCmd() {
       case FOLLOW_THIRD_HEIGHT:
         retval = follower_->FollowTo(craft_layer_, CRAFT_THIRD);
         break;
-      case FIRST_PROGRESSIVE: 
+      case FIRST_PROGRESSIVE:
         retval = follower_->IncrFollowTo(craft_layer_, CRAFT_FIRST);
         break;
       case SECOND_PROGRESSIVE:
@@ -186,7 +186,7 @@ void PlcCraft::Update() {
   } else if (!execute_error_ && gas_->status_ == PLC_DONE && \
       follower_->status_ == PLC_DONE && \
       GetCmdQueueSize() == 0) {
-    
+
     status_ = PLC_DONE;
   } else {
     status_ = PLC_EXEC;
@@ -196,4 +196,5 @@ void PlcCraft::Update() {
 void PlcCraft::UpdateDeviceCfg() {
   device_cfg_.UpdateGasCfg(*gas_);
   device_cfg_.UpdateFollowerCfg(*follower_);
+  device_cfg_.AckAnyReceived();
 }

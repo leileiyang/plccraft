@@ -6,6 +6,7 @@
 #include <iostream>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+#include <boost/serialization/vector.hpp>
 
 class FollowerCfg {
  public:
@@ -16,7 +17,7 @@ class FollowerCfg {
   std::vector<bool> incr_enable_;
   std::vector<double> incr_time_;
   double lift_height_;
-  
+
   void Show() {
     for (int i = 0; i < CRAFT_LEVELS; i++) {
       std::cout << i << "->height:" << height_[i] << " incr_enable:" <<

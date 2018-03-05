@@ -10,11 +10,12 @@
 
 
 DeviceCfg::DeviceCfg(): gas_subscriber_(NULL), lhc_subscriber_(NULL),
-    context_(NULL) {}
+    context_(NULL), received_something_(false) {}
 
 DeviceCfg::~DeviceCfg() {
   zmq_close(gas_subscriber_);
   zmq_close(lhc_subscriber_);
+  zmq_close(ack_responder_);
   zmq_ctx_destroy(&context_);
 }
 
@@ -30,7 +31,11 @@ int DeviceCfg::InitCfgSocket() {
   zmq_connect(lhc_subscriber_, "tcp://localhost:6001");
   zmq_setsockopt(gas_subscriber_, ZMQ_SUBSCRIBE, "LHC", strlen("LHC"));
 
-  if (gas_subscriber_ && lhc_subscriber_) {
+  // ack responder
+  ack_responder_ = zmq_socket(context_, ZMQ_REQ);
+  zmq_connect(ack_responder_, "tcp://localhost:6000");
+
+  if (gas_subscriber_ && lhc_subscriber_ && ack_responder_) {
     return 0;
   }
   return -1;
@@ -81,6 +86,7 @@ int DeviceCfg::UpdateGasCfg(Gas &gas) {
     assert(layer < gas.gas_cfg_.size());
     ia >> gas.gas_cfg_[layer];
     gas.gas_cfg_[layer].Show();
+    received_something_ = true;
   } else if (rc < 0) {
     return -1;
   }
@@ -101,8 +107,21 @@ int DeviceCfg::UpdateFollowerCfg(Follower &follower) {
     assert(layer < follower.follower_cfg_.size());
     ia >> follower.follower_cfg_[layer];
     follower.follower_cfg_[layer].Show();
+    received_something_ = true;
   } else if (rc < 0) {
     return -1;
+  }
+  return 0;
+}
+
+int DeviceCfg::AckAnyReceived() {
+  if (received_something_) {
+    received_something_ = false;
+    zmq_msg_t reply;
+    zmq_msg_init_size(&reply, strlen("Received"));
+    memcpy(zmq_msg_data(&reply), "Received", strlen("Received"));
+    int rc = zmq_msg_send(&reply, ack_responder_, 0);
+    return rc;
   }
   return 0;
 }
