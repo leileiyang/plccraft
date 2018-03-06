@@ -8,7 +8,8 @@
 int main() {
   void *ctx = zmq_ctx_new();
   void *publisher = zmq_socket(ctx, ZMQ_PUB);
-  zmq_connect(publisher, "tcp://localhost:6001");
+  int ret = zmq_bind(publisher, "tcp://*:6001");
+  std::cout << "bind ret:" << ret << std::endl;
 
   void *sync = zmq_socket(ctx, ZMQ_REP);
   zmq_bind(sync, "tcp://*:6000");
@@ -56,11 +57,20 @@ int main() {
     std::cout << "size1: " << size << std::endl;
     zmq_msg_close(&message);
 
+    char buff[10];
+    sprintf(buff, "%d", i % 18);
+    zmq_msg_t layer;
+    zmq_msg_init_size(&layer, strlen(buff));
+    memcpy(zmq_msg_data(&layer), buff, strlen(buff));
+    size = zmq_msg_send(&layer, publisher, ZMQ_SNDMORE);
+    std::cout << "size2: " << size << std::endl;
+    zmq_msg_close(&layer);
+
     zmq_msg_t part;
     zmq_msg_init_size(&part, ofs.str().length());
     memcpy(zmq_msg_data(&part), ofs.str().c_str(), ofs.str().length());
     size = zmq_msg_send(&part, publisher, 0);
-    std::cout << "size2: " << size << std::endl;
+    std::cout << "size3: " << size << std::endl;
     zmq_msg_close(&part);
 
     sleep(0.1);
