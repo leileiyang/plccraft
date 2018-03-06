@@ -3,16 +3,16 @@
 
 #include <string>
 
-class Gas;
-class Follower;
+#include "GasCfg.h"
+#include "FollowerCfg.h"
 
 class DeviceCfg {
  public:
   DeviceCfg();
   ~DeviceCfg();
   int InitCfgSocket();
-  int UpdateGasCfg(Gas &gas);
-  int UpdateFollowerCfg(Follower &follower);
+  int UpdateGasCfg(std::vector<GasCfg> &gas_cfg);
+  int UpdateFollowerCfg(std::vector<FollowerCfg> &follower_cfg);
   int AckAnyReceived();
 
  private:

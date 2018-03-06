@@ -171,7 +171,7 @@ std::vector<std::string> StringSplit(const char *str) {
 }
 
 int FlTaskInit() {
-  if (plc_craft_.Initialize()) {
+  if (plc_craft.Initialize()) {
     return 0;
   }
   return -1;
@@ -188,8 +188,6 @@ int PlcCraftJob(int line) {
 int FlTaskCommand(const char *commandbuf) {
   std::vector<std::string> words = StringSplit(commandbuf);
   if (words.empty()) {
-    // whether there is a device parameter configure update
-    plc_craft.UpdateDeviceCfg();
     return 0;
   } else {
     int ret = 0;
@@ -1219,7 +1217,9 @@ prompt_again:
 				if (status_mode == STAT_MODE_STDOUT)
 					MDI_CMD_PROMPT_RESET();
 
-			}	// FD_ISSET(STDIN_FILENO, &rdfs)
+			} else { // FD_ISSET(STDIN_FILENO, &rdfs)
+        plc_craft.UpdateDeviceCfg();
+      }
 
 			continue;	// UI_EMC_INTERP_IDLE
 

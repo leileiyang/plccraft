@@ -1,8 +1,5 @@
 #include "DeviceCfg.h"
 
-#include "../gas/Gas.h"
-#include "../follower/Follower.h"
-
 #include <zmq.h>
 #include <sstream>
 #include <cstdlib>
@@ -29,7 +26,7 @@ int DeviceCfg::InitCfgSocket() {
   // follower subscriber socket
   lhc_subscriber_ = zmq_socket(context_, ZMQ_SUB);
   zmq_connect(lhc_subscriber_, "tcp://localhost:6001");
-  zmq_setsockopt(gas_subscriber_, ZMQ_SUBSCRIBE, "LHC", strlen("LHC"));
+  zmq_setsockopt(lhc_subscriber_, ZMQ_SUBSCRIBE, "LHC", strlen("LHC"));
 
   // ack responder
   ack_responder_ = zmq_socket(context_, ZMQ_REQ);
@@ -73,7 +70,7 @@ int DeviceCfg::ZmqRecvx(void *socket, std::string &identity, std::string &layer,
   return part_no;
 }
 
-int DeviceCfg::UpdateGasCfg(Gas &gas) {
+int DeviceCfg::UpdateGasCfg(std::vector<GasCfg> &gas_cfg) {
   std::string identity;
   std::string layer_str;
   std::string content;
@@ -83,17 +80,19 @@ int DeviceCfg::UpdateGasCfg(Gas &gas) {
     std::istringstream ifs(content);
     boost::archive::text_iarchive ia(ifs);
     int layer = atoi(layer_str.c_str());
-    assert(layer < gas.gas_cfg_.size());
-    ia >> gas.gas_cfg_[layer];
-    gas.gas_cfg_[layer].Show();
+    assert(layer < gas_cfg.size());
+    ia >> gas_cfg[layer];
+    gas_cfg[layer].Show();
     received_something_ = true;
   } else if (rc < 0) {
     return -1;
+  } else if (rc != 0) {
+    received_something_ = true;
   }
   return 0;
 }
 
-int DeviceCfg::UpdateFollowerCfg(Follower &follower) {
+int DeviceCfg::UpdateFollowerCfg(std::vector<FollowerCfg> &follower_cfg) {
   std::string identity;
   std::string layer_str;
   std::string content;
@@ -104,12 +103,14 @@ int DeviceCfg::UpdateFollowerCfg(Follower &follower) {
     std::istringstream ifs(content);
     boost::archive::text_iarchive ia(ifs);
     int layer = atoi(layer_str.c_str());
-    assert(layer < follower.follower_cfg_.size());
-    ia >> follower.follower_cfg_[layer];
-    follower.follower_cfg_[layer].Show();
+    assert(layer < follower_cfg.size());
+    ia >> follower_cfg[layer];
+    follower_cfg[layer].Show();
     received_something_ = true;
   } else if (rc < 0) {
     return -1;
+  } else if (rc != 0) {
+    received_something_ = true;
   }
   return 0;
 }

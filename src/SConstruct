@@ -1,7 +1,7 @@
-env = Environment()
+env = Environment(CCFLAGS='-g')
 Export('env')
 objs = []
-src_files = Split("""ne_linuxcnc_ui_puma
+src_files = Split("""ne_linuxcnc_ui_puma.cc
                      shcom.cc
                   """)
 for subdir in ['fl', 'devices']:
@@ -9,6 +9,6 @@ for subdir in ['fl', 'devices']:
   objs.extend(o)
 
 src_files = src_files + objs
-Program('fltask', src_files, 
+env.Program('fltask', src_files, 
         LIBS=['rt', 'm', 'nml', 'linuxcncini', 'linuxcnc', 'boost_serialization', 'zmq'],
         CPPPATH=['/usr/include/linuxcnc', '.'])

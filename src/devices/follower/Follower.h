@@ -4,7 +4,7 @@
 #include "../dev_cfg/FollowerCfg.h"
 #include "FLhcInterface.h"
 
-class DeviceCfg;
+class PlcCraft;
 
 class Follower {
  public:
@@ -18,7 +18,7 @@ class Follower {
 
   PLC_STATUS status_;
 
-  friend class DeviceCfg;
+  friend class PlcCraft;
 
  private:
   std::vector<FollowerCfg> follower_cfg_;
