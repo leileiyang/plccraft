@@ -160,7 +160,7 @@ int PlcCraft::DoCmd() {
       case SECOND_PROGRESSIVE:
         retval = follower_->IncrFollowTo(craft_layer_, CRAFT_SECOND);
         break;
-      case THRED_PROGRESSIVE:
+      case THIRD_PROGRESSIVE:
         retval = follower_->IncrFollowTo(craft_layer_, CRAFT_THIRD);
         break;
 
