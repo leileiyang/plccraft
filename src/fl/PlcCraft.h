@@ -6,56 +6,8 @@
 #include "../devices/gas/Gas.h"
 #include "../devices/follower/Follower.h"
 #include "../devices/dev_cfg/DeviceCfg.h"
+#include "../devices/dev_cfg/PlcCfg.h"
 
-enum PLC_CMD_ENUM {
-  // 
-  PLC_CMD_NONE = 0,
-  // Gas Command
-  OPEN_CUTTING_GAS = 100,
-  OPEN_FIRST_GAS = 101,
-  OPEN_SECOND_GAS = 102,
-  OPEN_THIRD_GAS = 103,
-
-  CLOSE_CUTTING_GAS = 104,
-  CLOSE_FIRST_GAS = 105,
-  CLOSE_SECOND_GAS = 106,
-  CLOSE_THIRD_GAS = 107,
-
-  SET_CUTTING_PRESSURE = 108,
-  SET_FIRST_PRESSURE = 109,
-  SET_SECOND_PRESSURE = 110,
-  SET_THIRD_PRESSURE = 111,
-
-  // Follower Command
-  FOLLOW_CUTTING_HEIGHT = 120,
-  FOLLOW_FIRST_HEIGHT = 121,
-  FOLLOW_SECOND_HEIGHT = 122,
-  FOLLOW_THIRD_HEIGHT = 123,
-
-  FIRST_PROGRESSIVE = 124,
-  SECOND_PROGRESSIVE = 125,
-  THIRD_PROGRESSIVE = 126,
-
-  FOLLOW_LIFT_TO = 127,
-
-  // Laser Command
-  OPEN_LASER = 140,
-  CLOSE_LASER = 141,
-  OPEN_SHUTTER = 142,
-  CLOSE_SHUTTER = 143,
-
-  // Delay Command
-  CUTTING_DELAY = 150,
-  FIRST_DELAY = 151,
-  SECOND_DELAY = 152,
-  THIRD_DELAY = 153,
-
-  CUTTING_BLOW_DELAY = 154,
-  FIRST_BLOW_DELAY = 155,
-  SECOND_BLOW_DELAY = 156,
-  THIRD_BLOW_DELAY = 157,
-
-};
 
 enum PLC_TASK_EXEC_ENUM {
   PLC_TASK_EXEC_ERROR = 1,

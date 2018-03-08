@@ -87,10 +87,10 @@ PLC_STATUS PlcCraft::IssueCmd() {
 
 PLC_TASK_EXEC_ENUM PlcCraft::CheckPostCondition() {
   switch (cmd_) {
-    case FOLLOW_CUTTING_HEIGHT:
-    case FOLLOW_FIRST_HEIGHT:
-    case FOLLOW_SECOND_HEIGHT:
-    case FOLLOW_THIRD_HEIGHT:
+    case LHC_FOLLOW_CUTTING:
+    case LHC_FOLLOW_FIRST:
+    case LHC_FOLLOW_SECOND:
+    case LHC_FOLLOW_THIRD:
       return PLC_TASK_EXEC_WAITING_FOR_LHC;
     default:
       return PLC_TASK_EXEC_DONE;
@@ -104,63 +104,63 @@ int PlcCraft::DoCmd() {
     cmd_ = GetNextCmd();
     switch (cmd_) {
       // Gas Command
-      case OPEN_CUTTING_GAS:
+      case GAS_OPEN_CUTTING:
         retval = gas_->Open(craft_layer_, CRAFT_CUTTING);
         break;
-      case OPEN_FIRST_GAS:
+      case GAS_OPEN_FIRST:
         retval = gas_->Open(craft_layer_, CRAFT_FIRST);
         break;
-      case OPEN_SECOND_GAS:
+      case GAS_OPEN_SECOND:
         retval = gas_->Open(craft_layer_, CRAFT_SECOND);
         break;
-      case OPEN_THIRD_GAS:
+      case GAS_OPEN_THIRD:
         retval = gas_->Open(craft_layer_, CRAFT_THIRD);
         break;
-      case CLOSE_CUTTING_GAS:
+      case GAS_CLOSE_CUTTING:
         retval = gas_->Close(craft_layer_, CRAFT_CUTTING);
         break;
-      case CLOSE_FIRST_GAS:
+      case GAS_CLOSE_FIRST:
         retval = gas_->Close(craft_layer_, CRAFT_FIRST);
         break;
-      case CLOSE_SECOND_GAS:
+      case GAS_CLOSE_SECOND:
         retval = gas_->Close(craft_layer_, CRAFT_SECOND);
         break;
-      case CLOSE_THIRD_GAS:
+      case GAS_CLOSE_THIRD:
         retval = gas_->Close(craft_layer_, CRAFT_THIRD);
         break;
-      case SET_CUTTING_PRESSURE:
+      case GAS_PRESSURE_CUTTING:
         retval = gas_->SetPressure(craft_layer_, CRAFT_CUTTING);
         break;
-      case SET_FIRST_PRESSURE:
+      case GAS_PRESSURE_FIRST:
         retval = gas_->SetPressure(craft_layer_, CRAFT_FIRST);
         break;
-      case SET_SECOND_PRESSURE:
+      case GAS_PRESSURE_SECOND:
         retval = gas_->SetPressure(craft_layer_, CRAFT_SECOND);
         break;
-      case SET_THIRD_PRESSURE:
+      case GAS_PRESSURE_THIRD:
         retval = gas_->SetPressure(craft_layer_, CRAFT_THIRD);
         break;
 
         // Follower Command
-      case FOLLOW_CUTTING_HEIGHT:
+      case LHC_FOLLOW_CUTTING:
         retval = follower_->FollowTo(craft_layer_, CRAFT_CUTTING);
         break;
-      case FOLLOW_FIRST_HEIGHT:
+      case LHC_FOLLOW_FIRST:
         retval = follower_->FollowTo(craft_layer_, CRAFT_FIRST);
         break;
-      case FOLLOW_SECOND_HEIGHT:
+      case LHC_FOLLOW_SECOND:
         retval = follower_->FollowTo(craft_layer_, CRAFT_SECOND);
         break;
-      case FOLLOW_THIRD_HEIGHT:
+      case LHC_FOLLOW_THIRD:
         retval = follower_->FollowTo(craft_layer_, CRAFT_THIRD);
         break;
-      case FIRST_PROGRESSIVE:
+      case LHC_PROGRESSIVE_FIRST:
         retval = follower_->IncrFollowTo(craft_layer_, CRAFT_FIRST);
         break;
-      case SECOND_PROGRESSIVE:
+      case LHC_PROGRESSIVE_SECOND:
         retval = follower_->IncrFollowTo(craft_layer_, CRAFT_SECOND);
         break;
-      case THIRD_PROGRESSIVE:
+      case LHC_PROGRESSIVE_THIRD:
         retval = follower_->IncrFollowTo(craft_layer_, CRAFT_THIRD);
         break;
 
