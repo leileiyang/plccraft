@@ -2,6 +2,6 @@ Import('env')
 objs = []
 
 objs.append(env.Object(['gas/Gas.cpp', 'gas/GasInterface.cpp']))
-objs.append(env.Object(['follower/Follower.cpp', 'follower/FLhcInterface.cpp']))
+objs.append(env.Object(['follower/Follower.cpp', 'follower/LhcInterface.cpp']))
 objs.append(env.Object(['dev_cfg/DeviceCfg.cpp']))
 Return('objs')

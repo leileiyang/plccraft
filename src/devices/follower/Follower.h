@@ -2,7 +2,7 @@
 #define FOLLOWER_H_
 
 #include "../dev_cfg/FollowerCfg.h"
-#include "FLhcInterface.h"
+#include "LhcInterface.h"
 
 class PlcCraft;
 
@@ -22,7 +22,7 @@ class Follower {
 
  private:
   std::vector<FollowerCfg> follower_cfg_;
-  FLhcInterface *flhc_intf_;
+  LhcInterface *lhc_intf_;
 
 };
 

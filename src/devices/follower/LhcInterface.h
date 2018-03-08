@@ -4,7 +4,7 @@
 #include <string>
 #include "../../fl/FlBaseCfg.h"
 
-class FLhcInterface {
+class LhcInterface {
  public:
   virtual bool FollowTo(double height);
   virtual bool IncrFollowTo(double height, double time);

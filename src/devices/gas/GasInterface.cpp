@@ -16,7 +16,7 @@ std::map<GasType, std::string> GasInterface::CreateGasItems() {
 }
 
 bool GasInterface::Open(GasType gas_type) {
-  std::cout << "Open " <<  gas_items_[gas_type] << std::endl;
+  std::cout << "Open " << gas_items_[gas_type] << std::endl;
   return true;
 }
 
