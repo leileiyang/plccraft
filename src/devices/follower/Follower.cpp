@@ -14,6 +14,9 @@ int Follower::FollowTo(int layer, int craft_level) {
   if (layer >= CRAFT_LAYERS || craft_level >= CRAFT_LEVELS) {
     return -1;
   }
+  if (follower_cfg_[layer].no_follow_) {
+    return 0;
+  }
   if (lhc_intf_->FollowTo(follower_cfg_[layer].height_[craft_level])) {
     return 0; 
   } else {
@@ -25,6 +28,11 @@ int Follower::IncrFollowTo(int layer, int craft_level) {
   if (layer >= CRAFT_LAYERS || craft_level >= CRAFT_LEVELS) {
     return -1;
   }
+
+  if (follower_cfg_[layer].no_follow_) {
+    return 0;
+  }
+
   if (craft_level == CRAFT_CUTTING) {
       return 0;
   }
