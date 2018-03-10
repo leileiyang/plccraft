@@ -6,16 +6,14 @@
 #include "../devices/gas/Gas.h"
 #include "../devices/follower/Follower.h"
 #include "../devices/dev_cfg/DeviceCfg.h"
-#include "../devices/dev_cfg/PlcCfg.h"
 
-
-enum PLC_TASK_EXEC_ENUM {
-  PLC_TASK_EXEC_ERROR = 1,
-  PLC_TASK_EXEC_DONE = 2,
-  PLC_TASK_EXEC_WAITING_FOR_GAS = 3,
-  PLC_TASK_EXEC_WAITING_FOR_LHC = 4,
-  PLC_TASK_EXEC_WAITING_FOR_LASER = 5,
-  PLC_TASK_EXEC_WAITING_FOR_DELAY = 6,
+enum PLC_EXEC_ENUM {
+  PLC_EXEC_ERROR = 1,
+  PLC_EXEC_DONE = 2,
+  PLC_EXEC_WAITING_FOR_GAS = 3,
+  PLC_EXEC_WAITING_FOR_LHC = 4,
+  PLC_EXEC_WAITING_FOR_LASER = 5,
+  PLC_EXEC_WAITING_FOR_DELAY = 6,
 };
 
 class PlcCraft {
@@ -31,7 +29,7 @@ class PlcCraft {
 
   int craft_layer_;
   PLC_STATUS status_;
-  PLC_TASK_EXEC_ENUM exec_state_; 
+  PLC_EXEC_ENUM exec_state_; 
 
  private:
   int execute_error_;
@@ -41,7 +39,7 @@ class PlcCraft {
   const std::size_t GetCmdQueueSize();
   void DetachLastCmd();
   int DoCmd();
-  PLC_TASK_EXEC_ENUM CheckPostCondition();
+  PLC_EXEC_ENUM CheckPostCondition();
   void TaskAbort();
 
   DeviceCfg device_cfg_;

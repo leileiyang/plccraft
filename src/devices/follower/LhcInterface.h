@@ -2,7 +2,7 @@
 #define FLHCINTERFACE_H_
 
 #include <string>
-#include "../../fl/FlBaseCfg.h"
+#include "../../fl/FlBase.h"
 
 class LhcInterface {
  public:

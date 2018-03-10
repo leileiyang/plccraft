@@ -1,7 +1,7 @@
 #include "PlcCraft.h"
 
 PlcCraft::PlcCraft(): craft_layer_(0), status_(PLC_DONE),
-    exec_state_(PLC_TASK_EXEC_DONE), execute_error_(0) {
+    exec_state_(PLC_EXEC_DONE), execute_error_(0) {
 
   gas_ = new Gas;
   follower_ = new Follower;
@@ -22,7 +22,7 @@ void PlcCraft::LoadCraft(int craft_layer) {
 void PlcCraft::TaskAbort() {
   cmd_ = PLC_CMD_NONE;
   cmds_ = std::queue<PLC_CMD_ENUM>();
-  exec_state_ = PLC_TASK_EXEC_DONE;
+  exec_state_ = PLC_EXEC_DONE;
   execute_error_ = 0;
   follower_->Close();
   gas_->Close();
@@ -30,24 +30,24 @@ void PlcCraft::TaskAbort() {
 
 PLC_STATUS PlcCraft::Execute() {
   switch (exec_state_) {
-    case PLC_TASK_EXEC_DONE:
+    case PLC_EXEC_DONE:
       IssueCmd();
       break;
-    case PLC_TASK_EXEC_ERROR:
+    case PLC_EXEC_ERROR:
       TaskAbort();
       break;
-    case PLC_TASK_EXEC_WAITING_FOR_LHC:
+    case PLC_EXEC_WAITING_FOR_LHC:
       if (follower_->status_ == PLC_ERROR) {
-        exec_state_ = PLC_TASK_EXEC_ERROR;
+        exec_state_ = PLC_EXEC_ERROR;
       } else if (follower_->status_ == PLC_DONE) {
-        exec_state_ = PLC_TASK_EXEC_DONE;
+        exec_state_ = PLC_EXEC_DONE;
       }
       break;
-    case PLC_TASK_EXEC_WAITING_FOR_GAS:
+    case PLC_EXEC_WAITING_FOR_GAS:
       if (gas_->status_ == PLC_ERROR) {
-        exec_state_ = PLC_TASK_EXEC_ERROR;
+        exec_state_ = PLC_EXEC_ERROR;
       } else if (gas_->status_ == PLC_DONE) {
-        exec_state_ = PLC_TASK_EXEC_DONE;
+        exec_state_ = PLC_EXEC_DONE;
       }
     default:
       break;
@@ -78,22 +78,22 @@ PLC_STATUS PlcCraft::IssueCmd() {
     return PLC_ERROR;
   }
   exec_state_ = CheckPostCondition();
-  if (exec_state_ == PLC_TASK_EXEC_DONE) {
+  if (exec_state_ == PLC_EXEC_DONE) {
     return PLC_DONE;
   } else {
     return PLC_EXEC;
   }
 }
 
-PLC_TASK_EXEC_ENUM PlcCraft::CheckPostCondition() {
+PLC_EXEC_ENUM PlcCraft::CheckPostCondition() {
   switch (cmd_) {
     case LHC_FOLLOW_CUTTING:
     case LHC_FOLLOW_FIRST:
     case LHC_FOLLOW_SECOND:
     case LHC_FOLLOW_THIRD:
-      return PLC_TASK_EXEC_WAITING_FOR_LHC;
+      return PLC_EXEC_WAITING_FOR_LHC;
     default:
-      return PLC_TASK_EXEC_DONE;
+      return PLC_EXEC_DONE;
       break;
   }
 }
@@ -164,6 +164,12 @@ int PlcCraft::DoCmd() {
         retval = follower_->IncrFollowTo(craft_layer_, CRAFT_THIRD);
         break;
 
+        // Delay Command
+      case DELAY_STAY_CUTTING:
+      case DELAY_STAY_FIRST:
+      case DELAY_STAY_SECOND:
+      case DELAY_STAY_THIRD:
+        break;
       default:
         break;
     }
