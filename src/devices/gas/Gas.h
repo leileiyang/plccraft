@@ -24,8 +24,12 @@ class Gas {
   friend class PlcCraft;
 
  private:
+  // static configure
   std::vector<GasCfg> gas_cfg_;
   GasInterface *gas_intf_;
+
+  // state information
+  int working_gas_;
 
 };
 
