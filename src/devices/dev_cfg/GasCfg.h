@@ -1,7 +1,7 @@
 #ifndef GASCFG_H_
 #define GASCFG_H_
 
-#include "../../fl/FlBaseCfg.h"
+#include "PlcCfg.h"
 #include <vector>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
