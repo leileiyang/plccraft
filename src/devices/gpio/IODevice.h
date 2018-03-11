@@ -1,18 +1,15 @@
+#ifndef IODEVICE_H_
+#define IODEVICE_H_
 #include <map>
-
-struct FuncNode {
-  int func_id;
-  int on;
-  int reversal;
-};
+#include <bitset>
 
 class IODevice {
  public:
   int Open(int port);
-  int Open(int func_id);
   int Close(int port);
-  int Close(int func_id);
 
-  std::map<int, FuncNode> func_map_;
-
+  // static resources
+  std::bitset<17> ports_;
 };
+
+#endif

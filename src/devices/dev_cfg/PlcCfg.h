@@ -94,6 +94,21 @@ enum PLC_CMD_ENUM {
   DELAY_STAY_SECOND = 190,
   DELAY_STAY_THIRD = 191,
 
+  // Alarm function id
+  GAS_LPRESSURE_ALARM = 300,
+  GAS_HPRESSURE_ALARM = 301,
+  GAS_AIR_ALARM = 302,
+  GAS_O2_ALARM = 303,
+  GAS_N2_ALARM = 304,
+
+  // Gas function id
+  GAS_AIR = 400,
+  GAS_O2 = 401,
+  GAS_N2 = 402,
+  GAS_HIGH_AIR = 403,
+  GAS_HIGH_O2 = 404,
+  GAS_HIGH_N2 = 405,
+
 };
 
 #endif
