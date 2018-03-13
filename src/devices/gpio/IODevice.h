@@ -4,6 +4,8 @@
 
 #include "../dev_cfg/IOCfg.h"
 
+class PlcCraft;
+
 class IODevice {
  public:
   /// mode == 0, open the io port through por number
@@ -15,6 +17,8 @@ class IODevice {
   // static resources
   std::bitset<IO_PORT_SIZE> ports_;
   IOCfg io_cfg_;
+
+  friend class PlcCraft;
 
 private:
   int GetPortNoByFuncId(int func_id);
