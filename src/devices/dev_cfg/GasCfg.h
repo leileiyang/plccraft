@@ -27,7 +27,7 @@ namespace serialization {
 
 template <class Archive>
 void serialize(Archive &ar, GasCfg &cfg, const unsigned int version) {
-  ar & cfg. gas_;
+  ar & cfg.gas_;
   ar & cfg.pressure_;
 }
 

@@ -12,11 +12,18 @@
 
 #define CRAFT_LEVELS 4
 
+#define IO_PORT_SIZE 17
+
 enum CRAFT_LEVEL {
     CRAFT_CUTTING = 0,
     CRAFT_FIRST = 1,
     CRAFT_SECOND = 2,
     CRAFT_THIRD = 3,
+};
+
+enum IO_OP_MODE {
+  PORT_NUM,
+  FUNC_ID,
 };
 
 enum GasType {
