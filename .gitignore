@@ -3,4 +3,5 @@ src/*.[oa]
 src/devices/dev_cfg/*.[oa]
 src/devices/follower/*.[oa]
 src/devices/gas/*.[oa]
+src/devices/gpio/*.[oa]
 *~
