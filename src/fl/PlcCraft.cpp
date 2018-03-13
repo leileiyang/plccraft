@@ -1,13 +1,26 @@
 #include "PlcCraft.h"
+#include "../devices/gas/IOGas.h"
 
 PlcCraft::PlcCraft(): craft_layer_(0), status_(PLC_DONE),
     exec_state_(PLC_EXEC_DONE), execute_error_(0) {
 
+  output_ = new IODevice;
   gas_ = new Gas;
   follower_ = new Follower;
 }
 
+PlcCraft::~PlcCraft() {
+  delete gas_;
+  delete follower_;
+  delete output_;
+}
+
 bool PlcCraft::Initialize() {
+  // gas device initialization
+  IOGas *io_gas = new IOGas(output_);
+  gas_->ConnectInterface(io_gas);
+
+  // zmq socket initialization
   if (device_cfg_.InitCfgSocket()) {
     return false;
   }

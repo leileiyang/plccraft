@@ -5,6 +5,7 @@
 
 #include "../devices/gas/Gas.h"
 #include "../devices/follower/Follower.h"
+#include "../devices/gpio/IODevice.h"
 #include "../devices/dev_cfg/DeviceCfg.h"
 
 enum PLC_EXEC_ENUM {
@@ -19,6 +20,7 @@ enum PLC_EXEC_ENUM {
 class PlcCraft {
  public:
   PlcCraft();
+  ~PlcCraft();
   bool Initialize();
   void AddCmd(PLC_CMD_ENUM command);
   PLC_STATUS IssueCmd();
@@ -45,6 +47,7 @@ class PlcCraft {
   DeviceCfg device_cfg_;
   Gas *gas_;
   Follower *follower_;
+  IODevice *output_;
 
 };
 
