@@ -10,12 +10,16 @@ class Gas {
  public:
   Gas();
   ~Gas();
-  int Open(GasType gas);
+  int Open(int gas_id);
   int Open(int layer, int craft_level);
   int Close(int layer, int craft_level);
-  int Close(GasType gas);
+  int Close(int gas_id);
   int SetPressure(int layer, int craft_level);
-  int SetPressure(GasType gas);
+  int SetPressure(int gas_id);
+
+  // Before using the gas device, you must connect a
+  // gas interface class instances first.
+  int ConnectInterface(GasInterface *gas_intf);
   void Update();
 
   virtual void Close();
@@ -30,6 +34,8 @@ class Gas {
 
   // state information
   int working_gas_;
+  // 0->off; 1->on
+  int on_;
 
 };
 
