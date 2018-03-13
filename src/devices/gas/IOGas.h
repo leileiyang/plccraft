@@ -9,13 +9,11 @@
 class IOGas: public GasInterface {
  public:
   explicit IOGas(IODevice *io_dev): io_dev_(io_dev) {}
-  virtual bool Open(GasType gas_type);
-  virtual bool Close(GasType gas_type);
-  virtual bool SetPressure(GasType gas_type, double pressure);
-  virtual void Update(PLC_STATUS status);
+  virtual bool Open(int gas_id);
+  virtual bool Close(int gas_id);
+  virtual bool SetPressure(int gas_id, double pressure);
+  virtual void Update(PLC_STATUS status, int gas_id, int &on);
   virtual void Close();
-
-  int RegisterIODevice(IODevice *io_dev);
 
  private:
   IODevice *io_dev_;
