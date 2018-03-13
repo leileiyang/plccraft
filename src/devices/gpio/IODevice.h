@@ -1,15 +1,23 @@
 #ifndef IODEVICE_H_
 #define IODEVICE_H_
-#include <map>
 #include <bitset>
+
+#include "../dev_cfg/IOCfg.h"
 
 class IODevice {
  public:
-  int Open(int port);
-  int Close(int port);
+  /// mode == 0, open the io port through por number
+  /// mode == 1, open the io port through the configured function id
+  int Open(int port, int mode = FUNC_ID);
+  int Close(int port, int mode = FUNC_ID);
+  int GetPortState(int port, int mode = FUNC_ID);
 
   // static resources
-  std::bitset<17> ports_;
+  std::bitset<IO_PORT_SIZE> ports_;
+  IOCfg io_cfg_;
+
+private:
+  int GetPortNoByFuncId(int func_id);
 };
 
 #endif
