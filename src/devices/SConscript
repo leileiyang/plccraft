@@ -1,7 +1,15 @@
 Import('env')
 objs = []
 
-objs.append(env.Object(['gas/Gas.cpp', 'gas/GasInterface.cpp']))
-objs.append(env.Object(['follower/Follower.cpp', 'follower/LhcInterface.cpp']))
+objs.append(env.Object(['gas/Gas.cpp',
+                        'gas/GasInterface.cpp',
+                        'gas/IOGas.cpp']))
+
+objs.append(env.Object(['follower/Follower.cpp',
+                        'follower/LhcInterface.cpp']))
+
 objs.append(env.Object(['dev_cfg/DeviceCfg.cpp']))
+
+objs.append(env.Object(['gpio/IODevice.cpp']))
+
 Return('objs')
