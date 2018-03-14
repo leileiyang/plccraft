@@ -15,7 +15,7 @@ class Gas {
   int Close(int layer, int craft_level);
   int Close(int gas_id);
   int SetPressure(int layer, int craft_level);
-  int SetPressure(int gas_id);
+  int SetPressure(int gas_id, double pressure);
 
   // Before using the gas device, you must connect a
   // gas interface class instances first.

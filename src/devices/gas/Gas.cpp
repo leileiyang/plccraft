@@ -17,12 +17,25 @@ int Gas::ConnectInterface(GasInterface *gas_intf) {
   }
 }
 
+int Gas::Open(int gas_id) {
+  if (gas_intf_->Open(gas_id)) {
+    working_gas_ = gas_id;
+    return 0; 
+  } else {
+    return -2;
+  }
+}
+
 int Gas::Open(int layer, int craft_level) {
   if (layer >= CRAFT_LAYERS || craft_level >= CRAFT_LEVELS) {
     return -1;
   }
-  if (gas_intf_->Open(gas_cfg_[layer].gas_[craft_level])) {
-    working_gas_ = gas_cfg_[layer].gas_[craft_level];
+  return Open(gas_cfg_[layer].gas_[craft_level]);
+}
+
+int Gas::Close(int gas_id) {
+  if (gas_intf_->Close(gas_id)) {
+    working_gas_ = PLC_CMD_NONE;
     return 0; 
   } else {
     return -2;
@@ -33,8 +46,12 @@ int Gas::Close(int layer, int craft_level) {
   if (layer >= CRAFT_LAYERS || craft_level >= CRAFT_LEVELS) {
     return -1;
   }
-  if (gas_intf_->Close(gas_cfg_[layer].gas_[craft_level])) {
-    working_gas_ = PLC_CMD_NONE;
+  return Close(gas_cfg_[layer].gas_[craft_level]);
+}
+
+
+int Gas::SetPressure(int gas_id, double pressure) {
+  if (gas_intf_->SetPressure(gas_id, pressure)) {
     return 0; 
   } else {
     return -2;
@@ -45,13 +62,9 @@ int Gas::SetPressure(int layer, int craft_level) {
   if (layer >= CRAFT_LAYERS || craft_level >= CRAFT_LEVELS) {
     return -1;
   }
-  if (gas_intf_->SetPressure(gas_cfg_[layer].gas_[craft_level], \
-      gas_cfg_[layer].pressure_[craft_level])) {
+  return SetPressure(gas_cfg_[layer].gas_[craft_level], \
+      gas_cfg_[layer].pressure_[craft_level]); 
 
-    return 0; 
-  } else {
-    return -2;
-  }
 }
 
 void Gas::Update() {
