@@ -1,5 +1,13 @@
 #ifndef PLCCFG_H_
 #define PLCCFG_H_
+
+#include <string>
+#include <iostream>
+
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/serialization/vector.hpp>
+
 // Auto command macro format: device_operate_level
 // e.g. GAS_OPEN_CUTTING
 //      GAS_OPEN_FIRST
@@ -117,5 +125,91 @@ enum PLC_CMD_ENUM {
   GAS_HIGH_N2 = 405,
 
 };
+
+struct PlcCmd {
+  int cmd_id;
+  std::string args;
+};
+
+
+
+class PlcCfg {
+ public:
+  std::vector<PlcCmd> cutting_;
+  std::vector<PlcCmd> pierce1_;
+  std::vector<PlcCmd> pierce2_;
+  std::vector<PlcCmd> pierce3_;
+  std::vector<PlcCmd> stripping_;
+  std::vector<PlcCmd> cooling_;
+  std::vector<PlcCmd> laser_off_;
+  std::vector<PlcCmd> laser_off_short_;
+
+  void Show() {
+    for (std::vector<PlcCmd>::iterator it = cutting_.begin();
+        it != cutting_.end(); it++) { 
+    
+      std::cout << it->cmd_id << ":" << it->args << std::endl;\
+    }
+    for (std::vector<PlcCmd>::iterator it = pierce1_.begin();
+        it != pierce1_.end(); it++) { 
+
+      std::cout << it->cmd_id << ":" << it->args << std::endl;\
+    }
+    for (std::vector<PlcCmd>::iterator it = pierce2_.begin();
+        it != pierce2_.end(); it++) { 
+
+      std::cout << it->cmd_id << ":" << it->args << std::endl;\
+    }
+    for (std::vector<PlcCmd>::iterator it = pierce3_.begin();
+        it != pierce3_.end(); it++) { 
+
+      std::cout << it->cmd_id << ":" << it->args << std::endl;\
+    }
+    for (std::vector<PlcCmd>::iterator it = cooling_.begin();
+        it != cooling_.end(); it++) { 
+
+      std::cout << it->cmd_id << ":" << it->args << std::endl;\
+    }
+    for (std::vector<PlcCmd>::iterator it = stripping_.begin();
+        it != stripping_.end(); it++) { 
+
+      std::cout << it->cmd_id << ":" << it->args << std::endl;\
+    }
+    for (std::vector<PlcCmd>::iterator it = laser_off_.begin();
+        it != laser_off_.end(); it++) { 
+
+      std::cout << it->cmd_id << ":" << it->args << std::endl;\
+    }
+    for (std::vector<PlcCmd>::iterator it = laser_off_short_.begin();
+        it != laser_off_short_.end(); it++) { 
+
+      std::cout << it->cmd_id << ":" << it->args << std::endl;\
+    }
+  }
+};
+
+namespace boost {
+namespace serialization {
+
+template <class Archive>
+void serialize(Archive &ar, PlcCmd &cfg, const unsigned int version) {
+  ar & cfg.cmd_id;
+  ar & cfg.args;
+}
+
+template <class Archive>
+void serialize(Archive &ar, PlcCfg &cfg, const unsigned int version) {
+  ar & cfg.cutting_;
+  ar & cfg.pierce1_;
+  ar & cfg.pierce2_;
+  ar & cfg.pierce3_;
+  ar & cfg.stripping_;
+  ar & cfg.cooling_;
+  ar & cfg.laser_off_;
+  ar & cfg.laser_off_short_;
+}
+
+}
+}
 
 #endif

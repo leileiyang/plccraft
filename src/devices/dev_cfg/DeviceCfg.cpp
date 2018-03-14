@@ -7,11 +7,12 @@
 
 
 DeviceCfg::DeviceCfg(): gas_subscriber_(NULL), lhc_subscriber_(NULL),
-    context_(NULL), received_something_(false) {}
+    plc_subscriber_(NULL), context_(NULL), received_something_(false) {}
 
 DeviceCfg::~DeviceCfg() {
   zmq_close(gas_subscriber_);
   zmq_close(lhc_subscriber_);
+  zmq_close(plc_subscriber_);
   zmq_close(ack_responder_);
   zmq_ctx_destroy(&context_);
 }
@@ -28,11 +29,16 @@ int DeviceCfg::InitCfgSocket() {
   zmq_connect(lhc_subscriber_, "tcp://localhost:6001");
   zmq_setsockopt(lhc_subscriber_, ZMQ_SUBSCRIBE, "LHC", strlen("LHC"));
 
+  // plc subscriber socket
+  plc_subscriber_ = zmq_socket(context_, ZMQ_SUB);
+  zmq_connect(plc_subscriber_, "tcp://localhost:6001");
+  zmq_setsockopt(plc_subscriber_, ZMQ_SUBSCRIBE, "PLC", strlen("PLC"));
+
   // ack responder
   ack_responder_ = zmq_socket(context_, ZMQ_REQ);
   zmq_connect(ack_responder_, "tcp://localhost:6000");
 
-  if (gas_subscriber_ && lhc_subscriber_ && ack_responder_) {
+  if (gas_subscriber_ && lhc_subscriber_ && plc_subscriber_&& ack_responder_) {
     return 0;
   }
   return -1;
@@ -68,6 +74,25 @@ int DeviceCfg::ZmqRecvx(void *socket, std::string &identity, std::string &layer,
     }
   } while (true);
   return part_no;
+}
+
+int DeviceCfg::UpdatePlcCfg(PlcCfg &plc_cfg) {
+  std::string identity;
+  std::string layer_str;
+  std::string content;
+  int rc = ZmqRecvx(plc_subscriber_, identity, layer_str, content); 
+  if (rc == 3) {
+    std::istringstream ifs(content);
+    boost::archive::text_iarchive ia(ifs);
+    ia >> plc_cfg;
+    plc_cfg.Show();
+    received_something_ = true;
+  } else if (rc < 0) {
+    return -1;
+  } else if (rc != 0) {
+    received_something_ = true;
+  }
+  return 0;
 }
 
 int DeviceCfg::UpdateGasCfg(std::vector<GasCfg> &gas_cfg) {
