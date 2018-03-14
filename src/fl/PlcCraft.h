@@ -22,7 +22,7 @@ class PlcCraft {
   PlcCraft();
   ~PlcCraft();
   bool Initialize();
-  void AddCmd(PLC_CMD_ENUM command);
+  void AddCmd(PlcCmd command);
   PLC_STATUS IssueCmd();
   void Update();
   void UpdateDeviceCfg();
@@ -35,9 +35,9 @@ class PlcCraft {
 
  private:
   int execute_error_;
-  std::queue<PLC_CMD_ENUM> cmds_;
-  PLC_CMD_ENUM cmd_;
-  const PLC_CMD_ENUM GetNextCmd();
+  std::queue<PlcCmd> cmds_;
+  PlcCmd cmd_;
+  const PlcCmd GetNextCmd();
   const std::size_t GetCmdQueueSize();
   void DetachLastCmd();
   int DoCmd();
@@ -45,6 +45,7 @@ class PlcCraft {
   void TaskAbort();
 
   DeviceCfg device_cfg_;
+  PlcCfg plc_cfg_;
   Gas *gas_;
   Follower *follower_;
   IODevice *output_;

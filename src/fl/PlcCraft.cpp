@@ -33,8 +33,8 @@ void PlcCraft::LoadCraft(int craft_layer) {
 }
 
 void PlcCraft::TaskAbort() {
-  cmd_ = PLC_CMD_NONE;
-  cmds_ = std::queue<PLC_CMD_ENUM>();
+  cmd_.cmd_id = PLC_CMD_NONE;
+  cmds_ = std::queue<PlcCmd>();
   exec_state_ = PLC_EXEC_DONE;
   execute_error_ = 0;
   follower_->Close();
@@ -69,7 +69,7 @@ PLC_STATUS PlcCraft::Execute() {
   return status_;
 }
 
-void PlcCraft::AddCmd(PLC_CMD_ENUM command) {
+void PlcCraft::AddCmd(PlcCmd command) {
   cmds_.push(command);
 }
 
@@ -77,7 +77,7 @@ void PlcCraft::DetachLastCmd() {
   cmds_.pop();
 }
 
-const PLC_CMD_ENUM PlcCraft:: GetNextCmd() {
+const PlcCmd PlcCraft:: GetNextCmd() {
   return cmds_.front();
 }
 
@@ -91,15 +91,10 @@ PLC_STATUS PlcCraft::IssueCmd() {
     return PLC_ERROR;
   }
   exec_state_ = CheckPostCondition();
-  if (exec_state_ == PLC_EXEC_DONE) {
-    return PLC_DONE;
-  } else {
-    return PLC_EXEC;
-  }
 }
 
 PLC_EXEC_ENUM PlcCraft::CheckPostCondition() {
-  switch (cmd_) {
+  switch (cmd_.cmd_id) {
     case LHC_FOLLOW_CUTTING:
     case LHC_FOLLOW_FIRST:
     case LHC_FOLLOW_SECOND:
@@ -115,7 +110,7 @@ int PlcCraft::DoCmd() {
   int retval = 0;
   if (GetCmdQueueSize() != 0) {
     cmd_ = GetNextCmd();
-    switch (cmd_) {
+    switch (cmd_.cmd_id) {
       // Gas Command
       case GAS_OPEN_CUTTING:
         retval = gas_->Open(craft_layer_, CRAFT_CUTTING);
@@ -215,5 +210,6 @@ void PlcCraft::Update() {
 void PlcCraft::UpdateDeviceCfg() {
   device_cfg_.UpdateGasCfg(gas_->gas_cfg_);
   device_cfg_.UpdateFollowerCfg(follower_->follower_cfg_);
+  device_cfg_.UpdatePlcCfg(plc_cfg_);
   device_cfg_.AckAnyReceived();
 }
