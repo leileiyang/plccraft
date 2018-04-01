@@ -44,6 +44,13 @@ enum GasType {
   HIGH_NITROGEN,
 };
 
+enum TASK_CMD_ENUM {
+  TASK_START = 30,
+  TASK_PAUSE = 31,
+  TASK_STOP = 32,
+  TASK_RESUME = 33,
+};
+
 enum PLC_CMD_ENUM {
   // 
   PLC_CMD_NONE = 0,
@@ -130,8 +137,6 @@ struct PlcCmd {
   int cmd_id;
   std::string args;
 };
-
-
 
 class PlcCfg {
  public:
