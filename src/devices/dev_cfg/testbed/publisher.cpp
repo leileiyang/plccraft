@@ -1,5 +1,5 @@
-#include "GasCfg.h"
-#include "FollowerCfg.h"
+#include "../GasCfg.h"
+#include "../FollowerCfg.h"
 #include <zmq.h>
 #include <pthread.h>
 #include <iostream>

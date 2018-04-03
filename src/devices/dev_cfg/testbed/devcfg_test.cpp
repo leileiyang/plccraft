@@ -1,4 +1,4 @@
-#include "DeviceCfg.h"
+#include "../DeviceCfg.h"
 #include <zmq.h>
 #include <pthread.h>
 #include <sstream>
