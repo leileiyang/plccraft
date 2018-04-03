@@ -904,6 +904,7 @@ int main(int argc, char **argv)
 	int sfd;
 	struct signalfd_siginfo fdsi;
 
+  PlcCmd cmd;
 	// "getopt(3)" double colon to support multichar "-yyy" opts
 	// to comply with "scripts/linuxcnc" hardcoded "-ini" option
 	// passing.
@@ -1183,6 +1184,7 @@ int main(int argc, char **argv)
 				goto exit;
 			}
 
+      plc_craft.PullCommand(cmd);
 			// handle new MDI command from operator
 			if (FD_ISSET(STDIN_FILENO, &rdfs)) {
 				int z;
