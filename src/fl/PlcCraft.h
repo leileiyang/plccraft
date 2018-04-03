@@ -29,6 +29,8 @@ class PlcCraft {
   void LoadCraft(int craft_layer);
   PLC_STATUS Execute();
 
+  int PullCommand(PlcCmd &cmd);
+
   int craft_layer_;
   PLC_STATUS status_;
   PLC_EXEC_ENUM exec_state_; 

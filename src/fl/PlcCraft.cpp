@@ -213,3 +213,8 @@ void PlcCraft::UpdateDeviceCfg() {
   device_cfg_.UpdatePlcCfg(plc_cfg_);
   device_cfg_.AckAnyReceived();
 }
+
+
+int PlcCraft::PullCommand(PlcCmd &cmd) {
+  return device_cfg_.PullCommand(cmd);
+}
