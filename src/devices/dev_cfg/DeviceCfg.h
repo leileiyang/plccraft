@@ -17,11 +17,17 @@ class DeviceCfg {
   int UpdateFollowerCfg(std::vector<FollowerCfg> &follower_cfg);
   int AckAnyReceived();
 
+  int PullCommand(PlcCmd &cmd);
+
  private:
+  // data sockets
   void *gas_subscriber_;
   void *lhc_subscriber_;
   void *plc_subscriber_;
   void *ack_responder_;
+  // command sockets
+  void *responder_;
+
   void *context_;
   bool received_something_;
 

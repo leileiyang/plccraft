@@ -7,38 +7,47 @@
 
 
 DeviceCfg::DeviceCfg(): gas_subscriber_(NULL), lhc_subscriber_(NULL),
-    plc_subscriber_(NULL), context_(NULL), received_something_(false) {}
+    plc_subscriber_(NULL), responder_(NULL), context_(NULL), 
+    received_something_(false) {}
 
 DeviceCfg::~DeviceCfg() {
   zmq_close(gas_subscriber_);
   zmq_close(lhc_subscriber_);
   zmq_close(plc_subscriber_);
   zmq_close(ack_responder_);
+  zmq_close(responder_);
   zmq_ctx_destroy(&context_);
 }
 
 int DeviceCfg::InitCfgSocket() {
   void *context_ = zmq_ctx_new();
-  // gas subscriber socket
-  gas_subscriber_ = zmq_socket(context_, ZMQ_SUB);
-  zmq_connect(gas_subscriber_, "tcp://localhost:6001");
-  zmq_setsockopt(gas_subscriber_, ZMQ_SUBSCRIBE, "GAS", strlen("GAS"));
-
   // follower subscriber socket
   lhc_subscriber_ = zmq_socket(context_, ZMQ_SUB);
-  zmq_connect(lhc_subscriber_, "tcp://localhost:6001");
+  zmq_connect(lhc_subscriber_, "tcp://10.1.0.165:6001");
   zmq_setsockopt(lhc_subscriber_, ZMQ_SUBSCRIBE, "LHC", strlen("LHC"));
+
+  // gas subscriber socket
+  gas_subscriber_ = zmq_socket(context_, ZMQ_SUB);
+  zmq_connect(gas_subscriber_, "tcp://10.1.0.165:6001");
+  zmq_setsockopt(gas_subscriber_, ZMQ_SUBSCRIBE, "GAS", strlen("GAS"));
+
 
   // plc subscriber socket
   plc_subscriber_ = zmq_socket(context_, ZMQ_SUB);
-  zmq_connect(plc_subscriber_, "tcp://localhost:6001");
+  zmq_connect(plc_subscriber_, "tcp://10.1.0.165:6001");
   zmq_setsockopt(plc_subscriber_, ZMQ_SUBSCRIBE, "PLC", strlen("PLC"));
 
   // ack responder
   ack_responder_ = zmq_socket(context_, ZMQ_REQ);
-  zmq_connect(ack_responder_, "tcp://localhost:6000");
+  zmq_connect(ack_responder_, "tcp://10.1.0.165:6000");
 
-  if (gas_subscriber_ && lhc_subscriber_ && plc_subscriber_&& ack_responder_) {
+  // commmand responder socket
+  responder_ = zmq_socket(context_, ZMQ_REP);
+  zmq_bind(responder_, "tcp://*:5555");
+
+  if (gas_subscriber_ && lhc_subscriber_ && plc_subscriber_&& ack_responder_ &&
+      responder_) {
+
     return 0;
   }
   return -1;
@@ -74,6 +83,33 @@ int DeviceCfg::ZmqRecvx(void *socket, std::string &identity, std::string &layer,
     }
   } while (true);
   return part_no;
+}
+
+int DeviceCfg::PullCommand(PlcCmd &cmd) {
+  zmq_msg_t msg;
+  int rc = zmq_msg_init(&msg);
+  assert(rc == 0);
+  rc = zmq_msg_recv(&msg, responder_, ZMQ_DONTWAIT);
+  if (rc == -1 && errno == EAGAIN) {
+    return 0;
+  } else if (rc == -1) {
+    return -1;
+  }
+
+  std::string content;
+  content = std::string((char *)zmq_msg_data(&msg));
+  zmq_msg_close(&msg);
+
+  std::istringstream ifs(content);
+  boost::archive::text_iarchive ia(ifs);
+  ia >> cmd;
+
+  // reply
+  zmq_msg_t reply;
+  zmq_msg_init_size(&reply, strlen("Received"));
+  memcpy(zmq_msg_data(&reply), "Received", strlen("Received"));
+  rc = zmq_msg_send(&reply, responder_, 0);
+  return rc;
 }
 
 int DeviceCfg::UpdatePlcCfg(PlcCfg &plc_cfg) {
