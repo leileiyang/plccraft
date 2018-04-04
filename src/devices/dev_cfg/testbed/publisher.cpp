@@ -1,10 +1,11 @@
-#include "GasCfg.h"
-#include "FollowerCfg.h"
+#include "../GasCfg.h"
+#include "../FollowerCfg.h"
 #include <zmq.h>
 #include <pthread.h>
 #include <iostream>
 #include <sstream>
 #include <string.h>
+#include <unistd.h>
 
 void SendGasCfg(void *publisher) {
   std::ostringstream ofs;
@@ -103,6 +104,7 @@ int main() {
   void *sync = zmq_socket(ctx, ZMQ_REP);
   zmq_bind(sync, "tcp://*:6000");
 
+  int n = 0;
   do {
   zmq_msg_t hello;
   zmq_msg_init_size(&hello, strlen("GAS"));
@@ -114,10 +116,14 @@ int main() {
   zmq_msg_t reply;
   rc = zmq_msg_init(&reply);
   rc = zmq_msg_recv(&reply, sync, ZMQ_DONTWAIT);
+  sleep(1);
   if (rc >= 0) {
     break;
   }
+  n++;
   } while (1);
+
+  std::cout << "n:" << n << std::endl;
 
   int i = 0;
   do {
