@@ -185,49 +185,79 @@ int PlcCraftJob(int line) {
   plc_craft.LoadCraft(craft_layer);
 }
 
-int FlTaskCommand(const char *commandbuf) {
-  std::vector<std::string> words = StringSplit(commandbuf);
-  if (words.empty()) {
-    return 0;
-  } else {
-    int ret = 0;
-    if (words.front() == "c") {
-      if (words[1] == "open") {
-        PRINT_UI(status_mode, ">> Open file...\n");
-        ret = sendProgramOpen(const_cast<char *>(words[2].c_str()));
-      } else if (words[1] == "pause") {
-        PRINT_UI(status_mode, ">> Pause\n");
-        ret = sendProgramPause();
-        task_state = EMC_TASK_PAUSED;
-      } else if (words[1] == "start") {
-        PRINT_UI(status_mode, ">> Start\n");
-        ret = sendProgramRun(0);
-        task_state = EMC_TASK_BUSY;
-      } else if (words[1] == "resume") {
-        PRINT_UI(status_mode, ">> Resume\n");
-        ret = sendProgramResume();
-        task_state = EMC_TASK_BUSY;
-      } else if (words[1] == "mode") {
-        PRINT_UI(status_mode, ">> Set Mode\n");
-        if (words[2] == "auto") {
-          PRINT_UI(status_mode, ">> Set Auto\n");
-          ret = sendAuto();
-        } else if (words[2] == "mdi") {
-          PRINT_UI(status_mode, ">> Set Mdi\n");
-          ret = sendMdi();
-        } else if (words[2] == "manual") {
-          PRINT_UI(status_mode, ">> Set Manual\n");
-          ret = sendManual();
-        }
-      }
-    } else {
-      ret = sendMdiCmd(commandbuf);
+int FlTaskCommand(const PlcCmd &cmd) {
+  int ret = 0;
+  if (cmd.cmd_id == TASK_OPEN_FILE) {
+    PRINT_UI(status_mode, ">> Open file...\n");
+    ret = sendProgramOpen(const_cast<char *>(cmd.args.c_str()));
+  } else if (cmd.cmd_id == TASK_PAUSE) {
+    PRINT_UI(status_mode, ">> Pause\n");
+    ret = sendProgramPause();
+    plc_craft.TaskAbort();
+    task_state = EMC_TASK_PAUSED;
+  } else if (cmd.cmd_id == TASK_STOP) {
+    PRINT_UI(status_mode, ">> Stop\n");
+    ret = sendAbort();
+    plc_craft.TaskAbort();
+  } else if (cmd.cmd_id == TASK_START) {
+    PRINT_UI(status_mode, ">> Start\n");
+    ret = sendProgramRun(0);
+    task_state = EMC_TASK_BUSY;
+  } else if (cmd.cmd_id == TASK_RESUME) {
+    PRINT_UI(status_mode, ">> Resume\n");
+    ret = sendProgramResume();
+  } else if (cmd.cmd_id == TASK_SWITCH_MODE) {
+    PRINT_UI(status_mode, ">> Set Mode\n");
+    if (cmd.args == "auto") {
+      PRINT_UI(status_mode, ">> Set Auto\n");
+      ret = sendAuto();
+    } else if (cmd.args == "mdi") {
+      PRINT_UI(status_mode, ">> Set Mdi\n");
+      ret = sendMdi();
+    } else if (cmd.args == "manual") {
+      PRINT_UI(status_mode, ">> Set Manual\n");
+      ret = sendManual();
     }
-    if (ret < 0) {
-      task_state = EMC_TASK_ERROR;
-    }
-    return ret;
   }
+  if (ret < 0) {
+    task_state = EMC_TASK_ERROR;
+  }
+  return ret;
+}
+
+int CommandInPaused() {
+  int ret = 0;
+  PlcCmd cmd;
+  if (plc_craft.PullCommand(cmd)) {
+    switch (cmd.cmd_id) {
+      case TASK_RESUME:
+      case TASK_PAUSE:
+      case TASK_STOP:
+        PRINT_UI(status_mode, "echo command:%d->%c\n", cmd.cmd_id, cmd.args.c_str());
+        ret = FlTaskCommand(cmd);
+        break;
+      default:
+        break;
+    }
+  }
+  return ret;
+}
+
+int CommandInBusy() {
+  int ret = 0;
+  PlcCmd cmd;
+  if (plc_craft.PullCommand(cmd)) {
+    switch (cmd.cmd_id) {
+      case TASK_PAUSE:
+      case TASK_STOP:
+        PRINT_UI(status_mode, "echo command:%d->%c\n", cmd.cmd_id, cmd.args.c_str());
+        ret = FlTaskCommand(cmd);
+        break;
+      default:
+        break;
+    }
+  }
+  return ret;
 }
 
 
@@ -399,6 +429,7 @@ static int get_interpState(void)
       switch (emcStatus->task.interpState) {
         case EMC_TASK_INTERP_READING:
         case EMC_TASK_INTERP_WAITING:
+          task_state = EMC_TASK_BUSY;
           return UI_EMC_INTERP_BUSY;
 
         case EMC_TASK_INTERP_PAUSED:
@@ -1114,7 +1145,7 @@ int main(int argc, char **argv)
 #endif
 
 		case UI_EMC_INTERP_BUSY:	// keep polling NML channels
-
+      CommandInBusy();
 			if (status_mode == STAT_MODE_STDOUT)
 				PRINT_STAT_STR_PREP(status_mode);
 
@@ -1127,6 +1158,7 @@ int main(int argc, char **argv)
 			}
 			continue;
     case UI_EMC_INTERP_PAUSED: // interp paused in auto mode
+      CommandInPaused();
       if (task_state == EMC_TASK_PAUSED) {
         // paused by external prog
         ;
@@ -1138,7 +1170,9 @@ int main(int argc, char **argv)
         } else if (task_state == EMC_TASK_WAITING_FOR_PLC) { 
           ret = plc_craft.Execute();
           if (ret == PLC_DONE) {
-            FlTaskCommand("c resume");
+            cmd.cmd_id = TASK_RESUME;
+            cmd.args = "";
+            FlTaskCommand(cmd);
           } else if (ret == PLC_ERROR) {
             prerr("Plc Craft Error!\n");
             goto exit;
@@ -1184,32 +1218,10 @@ int main(int argc, char **argv)
 				goto exit;
 			}
 
-      plc_craft.PullCommand(cmd);
-			// handle new MDI command from operator
-			if (FD_ISSET(STDIN_FILENO, &rdfs)) {
-				int z;
-
-				ret = read(STDIN_FILENO, cmdbuf, LINELEN - 1);
-				if (ret <= 0) {
-					prerr("%s\n", strerror(errno));
-					goto exit;
-				}
-				cmdbuf[ret] = '\0';
-
-				// simplistic sanity check - improve it
-				for (z = 0; cmdbuf[z]; z++) {
-					char c = cmdbuf[z];
-					if (!isalnum(c) && !isblank(c)
-					    && c != '\n' && c != '+' && c != '-'
-					    && c != '.' && c != '[' && c != ']'
-					    && c != '<' && c != '>' && c != '*'
-					    && c != '#' && c != '/' && c != '_') {
-						goto prompt_again;
-					}
-				}
-        //upcase(cmdbuf);
-        PRINT_UI(status_mode, "echo command:%s\n", cmdbuf);
-        ret = FlTaskCommand(cmdbuf);
+			// handle new task command from operator
+			if (plc_craft.PullCommand(cmd)) {
+        PRINT_UI(status_mode, "echo command:%d->%c\n", cmd.cmd_id, cmd.args.c_str());
+        ret = FlTaskCommand(cmd);
 				if (ret < 0) {
 					prerr("Execute Command Failed!\n");
 					goto exit;

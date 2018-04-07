@@ -27,6 +27,7 @@ class PlcCraft {
   void Update();
   void UpdateDeviceCfg();
   void LoadCraft(int craft_layer);
+  void TaskAbort();
   PLC_STATUS Execute();
 
   int PullCommand(PlcCmd &cmd);
@@ -44,7 +45,6 @@ class PlcCraft {
   void DetachLastCmd();
   int DoCmd();
   PLC_EXEC_ENUM CheckPostCondition();
-  void TaskAbort();
 
   DeviceCfg device_cfg_;
   PlcCfg plc_cfg_;

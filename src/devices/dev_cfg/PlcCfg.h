@@ -49,6 +49,8 @@ enum TASK_CMD_ENUM {
   TASK_PAUSE = 31,
   TASK_STOP = 32,
   TASK_RESUME = 33,
+  TASK_SWITCH_MODE = 34,
+  TASK_OPEN_FILE = 35,
 };
 
 enum PLC_CMD_ENUM {
@@ -144,7 +146,7 @@ class PlcCfg {
   std::vector<PlcCmd> pierce1_;
   std::vector<PlcCmd> pierce2_;
   std::vector<PlcCmd> pierce3_;
-  std::vector<PlcCmd> stripping_;
+  std::vector<PlcCmd> striping_;
   std::vector<PlcCmd> cooling_;
   std::vector<PlcCmd> laser_off_;
   std::vector<PlcCmd> laser_off_short_;
@@ -175,8 +177,8 @@ class PlcCfg {
 
       std::cout << it->cmd_id << ":" << it->args << std::endl;\
     }
-    for (std::vector<PlcCmd>::iterator it = stripping_.begin();
-        it != stripping_.end(); it++) { 
+    for (std::vector<PlcCmd>::iterator it = striping_.begin();
+        it != striping_.end(); it++) { 
 
       std::cout << it->cmd_id << ":" << it->args << std::endl;\
     }
@@ -208,7 +210,7 @@ void serialize(Archive &ar, PlcCfg &cfg, const unsigned int version) {
   ar & cfg.pierce1_;
   ar & cfg.pierce2_;
   ar & cfg.pierce3_;
-  ar & cfg.stripping_;
+  ar & cfg.striping_;
   ar & cfg.cooling_;
   ar & cfg.laser_off_;
   ar & cfg.laser_off_short_;
