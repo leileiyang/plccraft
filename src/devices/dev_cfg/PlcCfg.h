@@ -140,6 +140,13 @@ struct PlcCmd {
   std::string args;
 };
 
+struct ProcessCfg {
+  bool no_lift;
+  bool keep_air;
+  bool no_follow;
+  int craft_level;
+};
+
 class PlcCfg {
  public:
   std::vector<PlcCmd> cutting_;
@@ -202,6 +209,14 @@ template <class Archive>
 void serialize(Archive &ar, PlcCmd &cfg, const unsigned int version) {
   ar & cfg.cmd_id;
   ar & cfg.args;
+}
+
+template <class Archive>
+void serialize(Archive &ar, ProcessCfg &cfg, const unsigned int version) {
+  ar & cfg.no_lift;
+  ar & cfg.keep_air;
+  ar & cfg.no_follow;
+  ar & cfg.craft_level;
 }
 
 template <class Archive>
