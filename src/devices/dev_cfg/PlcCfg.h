@@ -144,6 +144,7 @@ struct ProcessCfg {
   bool no_lift;
   bool keep_air;
   bool no_follow;
+  bool skip;
   bool striping;
   bool pre_pierce;
   int cutting;
@@ -220,6 +221,7 @@ void serialize(Archive &ar, ProcessCfg &cfg, const unsigned int version) {
   ar & cfg.no_lift;
   ar & cfg.keep_air;
   ar & cfg.no_follow;
+  ar & cfg.skip;
   ar & cfg.striping;
   ar & cfg.pre_pierce;
   ar & cfg.cutting;
