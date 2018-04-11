@@ -177,12 +177,8 @@ int FlTaskInit() {
   return -1;
 }
 
-int PlcCraftJob(int line) {
-  // 1. find the M07 from the given line
-  // 2. extract the craft layer
-  int craft_layer = 0;
-  // 3. send the craft layer to plc craft module
-  plc_craft.LoadCraft(craft_layer);
+int PlcCraftJob(int motion_line) {
+  plc_craft.LoadCraftProcesses(motion_line);
 }
 
 int FlTaskCommand(const PlcCmd &cmd) {

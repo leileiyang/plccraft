@@ -2,7 +2,8 @@
 #include "../devices/gas/IOGas.h"
 
 PlcCraft::PlcCraft(): craft_layer_(0), status_(PLC_DONE),
-    exec_state_(PLC_EXEC_DONE), execute_error_(0) {
+    exec_state_(PLC_EXEC_DONE), execute_error_(0),
+    process_cfg_(CRAFT_LAYERS, ProcessCfg()) {
 
   output_ = new IODevice;
   gas_ = new Gas;
@@ -27,9 +28,20 @@ bool PlcCraft::Initialize() {
   return true;
 }
 
-void PlcCraft::LoadCraft(int craft_layer) {
+bool PlcCraft::OpenJobImage(const char *file_name) {
+  return job_image_.Open(file_name);
+}
+
+void PlcCraft::CloseJobImage() {
+  job_image_.Close();
+}
+
+void PlcCraft::LoadCraftProcesses(int motion_line) {
   execute_error_ = 0;
-  craft_layer_ = craft_layer;
+  PlcJobInfo job_info = job_image_.GetPlcJobInfo(motion_line);
+  if (job_info.operation == JOB_M07) {
+    craft_layer_ = job_info.job_layer;
+  }
 }
 
 void PlcCraft::TaskAbort() {

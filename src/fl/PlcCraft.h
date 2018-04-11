@@ -2,11 +2,14 @@
 #define PLCCRAFT_H_
 
 #include <queue>
+#include <vector>
 
 #include "../devices/gas/Gas.h"
 #include "../devices/follower/Follower.h"
 #include "../devices/gpio/IODevice.h"
 #include "../devices/dev_cfg/DeviceCfg.h"
+
+#include "PlcJobImage.h"
 
 enum PLC_EXEC_ENUM {
   PLC_EXEC_ERROR = 1,
@@ -26,15 +29,17 @@ class PlcCraft {
   PLC_STATUS IssueCmd();
   void Update();
   void UpdateDeviceCfg();
-  void LoadCraft(int craft_layer);
+  void LoadCraftProcesses(int motion_line);
   void TaskAbort();
   PLC_STATUS Execute();
 
   int PullCommand(PlcCmd &cmd);
 
-  int craft_layer_;
   PLC_STATUS status_;
   PLC_EXEC_ENUM exec_state_; 
+
+  bool OpenJobImage(const char *file_name);
+  void CloseJobImage();
 
  private:
   int execute_error_;
@@ -48,9 +53,14 @@ class PlcCraft {
 
   DeviceCfg device_cfg_;
   PlcCfg plc_cfg_;
+  std::vector<ProcessCfg> process_cfg_;
+  
   Gas *gas_;
   Follower *follower_;
   IODevice *output_;
+
+  int craft_layer_;
+  PlcJobImage job_image_;
 
 };
 
