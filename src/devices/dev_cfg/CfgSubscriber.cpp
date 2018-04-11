@@ -1,4 +1,4 @@
-#include "DeviceCfg.h"
+#include "CfgSubscriber.h"
 
 #include <zmq.h>
 #include <sstream>
@@ -6,11 +6,11 @@
 #include <cstring>
 
 
-DeviceCfg::DeviceCfg(): gas_subscriber_(NULL), lhc_subscriber_(NULL),
+CfgSubscriber::CfgSubscriber(): gas_subscriber_(NULL), lhc_subscriber_(NULL),
     plc_subscriber_(NULL), responder_(NULL), context_(NULL), 
     received_something_(false) {}
 
-DeviceCfg::~DeviceCfg() {
+CfgSubscriber::~CfgSubscriber() {
   zmq_close(gas_subscriber_);
   zmq_close(lhc_subscriber_);
   zmq_close(plc_subscriber_);
@@ -19,7 +19,7 @@ DeviceCfg::~DeviceCfg() {
   zmq_ctx_destroy(&context_);
 }
 
-int DeviceCfg::InitCfgSocket() {
+int CfgSubscriber::InitCfgSocket() {
   void *context_ = zmq_ctx_new();
   // follower subscriber socket
   lhc_subscriber_ = zmq_socket(context_, ZMQ_SUB);
@@ -53,7 +53,7 @@ int DeviceCfg::InitCfgSocket() {
   return -1;
 }
 
-int DeviceCfg::ZmqRecvx(void *socket, std::string &identity, std::string &layer,
+int CfgSubscriber::ZmqRecvx(void *socket, std::string &identity, std::string &layer,
     std::string &content) {
 
   int part_no = 0;
@@ -85,7 +85,7 @@ int DeviceCfg::ZmqRecvx(void *socket, std::string &identity, std::string &layer,
   return part_no;
 }
 
-int DeviceCfg::PullCommand(PlcCmd &cmd) {
+int CfgSubscriber::PullCommand(PlcCmd &cmd) {
   zmq_msg_t msg;
   int rc = zmq_msg_init(&msg);
   assert(rc == 0);
@@ -112,7 +112,7 @@ int DeviceCfg::PullCommand(PlcCmd &cmd) {
   return rc;
 }
 
-int DeviceCfg::UpdatePlcCfg(PlcCfg &plc_cfg) {
+int CfgSubscriber::UpdatePlcCfg(PlcCfg &plc_cfg) {
   std::string identity;
   std::string layer_str;
   std::string content;
@@ -131,7 +131,7 @@ int DeviceCfg::UpdatePlcCfg(PlcCfg &plc_cfg) {
   return 0;
 }
 
-int DeviceCfg::UpdateGasCfg(std::vector<GasCfg> &gas_cfg) {
+int CfgSubscriber::UpdateGasCfg(std::vector<GasCfg> &gas_cfg) {
   std::string identity;
   std::string layer_str;
   std::string content;
@@ -153,7 +153,7 @@ int DeviceCfg::UpdateGasCfg(std::vector<GasCfg> &gas_cfg) {
   return 0;
 }
 
-int DeviceCfg::UpdateFollowerCfg(std::vector<FollowerCfg> &follower_cfg) {
+int CfgSubscriber::UpdateFollowerCfg(std::vector<FollowerCfg> &follower_cfg) {
   std::string identity;
   std::string layer_str;
   std::string content;
@@ -176,7 +176,7 @@ int DeviceCfg::UpdateFollowerCfg(std::vector<FollowerCfg> &follower_cfg) {
   return 0;
 }
 
-int DeviceCfg::AckAnyReceived() {
+int CfgSubscriber::AckAnyReceived() {
   if (received_something_) {
     received_something_ = false;
     zmq_msg_t reply;

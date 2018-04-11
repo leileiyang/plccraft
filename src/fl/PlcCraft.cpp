@@ -22,7 +22,7 @@ bool PlcCraft::Initialize() {
   gas_->ConnectInterface(io_gas);
 
   // zmq socket initialization
-  if (device_cfg_.InitCfgSocket()) {
+  if (cfg_subscriber_.InitCfgSocket()) {
     return false;
   }
   return true;
@@ -220,13 +220,13 @@ void PlcCraft::Update() {
 }
 
 void PlcCraft::UpdateDeviceCfg() {
-  device_cfg_.UpdateGasCfg(gas_->gas_cfg_);
-  device_cfg_.UpdateFollowerCfg(follower_->follower_cfg_);
-  device_cfg_.UpdatePlcCfg(plc_cfg_);
-  device_cfg_.AckAnyReceived();
+  cfg_subscriber_.UpdateGasCfg(gas_->gas_cfg_);
+  cfg_subscriber_.UpdateFollowerCfg(follower_->follower_cfg_);
+  cfg_subscriber_.UpdatePlcCfg(plc_cfg_);
+  cfg_subscriber_.AckAnyReceived();
 }
 
 
 int PlcCraft::PullCommand(PlcCmd &cmd) {
-  return device_cfg_.PullCommand(cmd);
+  return cfg_subscriber_.PullCommand(cmd);
 }

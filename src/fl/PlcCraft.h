@@ -7,7 +7,7 @@
 #include "../devices/gas/Gas.h"
 #include "../devices/follower/Follower.h"
 #include "../devices/gpio/IODevice.h"
-#include "../devices/dev_cfg/DeviceCfg.h"
+#include "../devices/dev_cfg/CfgSubscriber.h"
 
 #include "PlcJobImage.h"
 
@@ -51,7 +51,7 @@ class PlcCraft {
   int DoCmd();
   PLC_EXEC_ENUM CheckPostCondition();
 
-  DeviceCfg device_cfg_;
+  CfgSubscriber cfg_subscriber_;
   PlcCfg plc_cfg_;
   std::vector<ProcessCfg> process_cfg_;
   

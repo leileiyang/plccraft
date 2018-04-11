@@ -8,7 +8,7 @@ objs.append(env.Object(['gas/Gas.cpp',
 objs.append(env.Object(['follower/Follower.cpp',
                         'follower/LhcInterface.cpp']))
 
-objs.append(env.Object(['dev_cfg/DeviceCfg.cpp']))
+objs.append(env.Object(['dev_cfg/CfgSubscriber.cpp']))
 
 objs.append(env.Object(['gpio/IODevice.cpp']))
 

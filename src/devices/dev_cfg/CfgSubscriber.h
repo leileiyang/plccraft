@@ -7,10 +7,10 @@
 #include "GasCfg.h"
 #include "FollowerCfg.h"
 
-class DeviceCfg {
+class CfgSubscriber {
  public:
-  DeviceCfg();
-  ~DeviceCfg();
+  CfgSubscriber();
+  ~CfgSubscriber();
   int InitCfgSocket();
   int UpdateGasCfg(std::vector<GasCfg> &gas_cfg);
   int UpdatePlcCfg(PlcCfg &plc_cfg);
