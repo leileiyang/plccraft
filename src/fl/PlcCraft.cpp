@@ -28,6 +28,8 @@ bool PlcCraft::Initialize() {
   return true;
 }
 
+
+
 bool PlcCraft::OpenJobImage(const char *file_name) {
   return job_image_.Open(file_name);
 }
@@ -36,12 +38,63 @@ void PlcCraft::CloseJobImage() {
   job_image_.Close();
 }
 
+void PlcCraft::AppendPlcCmdToQueue(std::vector<PlcCmd> &cmds) {
+  for (std::vector<PlcCmd>::iterator iter = cmds.begin(); iter != cmds.end();
+      iter++) {
+
+    AddCmd(*iter);
+  }
+}
+
+void PlcCraft::LoadM07() {
+  if (craft_layer_ == STRIPING_LAYER_INDEX) {
+    AppendPlcCmdToQueue(plc_cfg_.striping_);
+  } else if (craft_layer_ == COOLING_LAYER_INDEX) {
+    AppendPlcCmdToQueue(plc_cfg_.cooling_);
+  } else {
+    switch (process_cfg_[craft_layer_].craft_level) {
+      case CRAFT_CUTTING:
+        AppendPlcCmdToQueue(plc_cfg_.cutting_);
+        break;
+      case CRAFT_FIRST:
+        AppendPlcCmdToQueue(plc_cfg_.pierce1_);
+        break;
+      case CRAFT_SECOND:
+        AppendPlcCmdToQueue(plc_cfg_.pierce1_);
+        break;
+      case CRAFT_THIRD:
+        AppendPlcCmdToQueue(plc_cfg_.pierce1_);
+        break;
+      default:
+        break;
+    }
+  }
+}
+
+void PlcCraft::LoadM08() {
+  AppendPlcCmdToQueue(plc_cfg_.laser_off_);
+}
+
+void PlcCraft::LoadProcesses(int operation) {
+  switch (operation) {
+  case JOB_M07:
+    LoadM07();
+    break;
+  case JOB_M08:
+    LoadM08();
+    break;
+  default:
+    break;
+  }
+}
+
 void PlcCraft::LoadCraftProcesses(int motion_line) {
   execute_error_ = 0;
   PlcJobInfo job_info = job_image_.GetPlcJobInfo(motion_line);
   if (job_info.operation == JOB_M07) {
     craft_layer_ = job_info.job_layer;
   }
+  LoadProcesses(job_info.operation);
 }
 
 void PlcCraft::TaskAbort() {
@@ -52,6 +105,8 @@ void PlcCraft::TaskAbort() {
   follower_->Close();
   gas_->Close();
 }
+
+
 
 PLC_STATUS PlcCraft::Execute() {
   switch (exec_state_) {
@@ -81,7 +136,7 @@ PLC_STATUS PlcCraft::Execute() {
   return status_;
 }
 
-void PlcCraft::AddCmd(PlcCmd command) {
+void PlcCraft::AddCmd(const PlcCmd &command) {
   cmds_.push(command);
 }
 
@@ -198,10 +253,10 @@ int PlcCraft::DoCmd() {
   return retval;
 }
 
+
+
 void PlcCraft::Update() {
-  // Update Gas
   gas_->Update();
-  // Update Follower
   follower_->Update();
   // Update Laser
 

@@ -25,7 +25,7 @@ class PlcCraft {
   PlcCraft();
   ~PlcCraft();
   bool Initialize();
-  void AddCmd(PlcCmd command);
+  void AddCmd(const PlcCmd &command);
   PLC_STATUS IssueCmd();
   void Update();
   void UpdateDeviceCfg();
@@ -61,6 +61,10 @@ class PlcCraft {
 
   int craft_layer_;
   PlcJobImage job_image_;
+  void AppendPlcCmdToQueue(std::vector<PlcCmd> &cmds);
+  void LoadProcesses(int operation);
+  void LoadM07();
+  void LoadM08();
 
 };
 
