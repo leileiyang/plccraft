@@ -3,10 +3,14 @@
 #include "GCodeBase.h"
 
 bool PlcJobImage::Open(const char *file_name) {
-  if((fp_ = fopen(file_name, "w")) == NULL) {
+  file_name_ = std::string(file_name);
+  return ReOpen();
+}
+
+bool PlcJobImage::ReOpen() {
+  if((fp_ = fopen(file_name_.c_str(), "w")) == NULL) {
     return false;
   }
-  file_name_ = std::string(file_name);
   current_line_ = 0;
   return true;
 }

@@ -19,6 +19,7 @@ class PlcJobImage {
  public:
   PlcJobImage(): file_name_(""), fp_(NULL), current_line_(0) {}
   bool Open(const char *file_name);
+  bool ReOpen();
   void Close();
   PlcJobInfo GetPlcJobInfo(int motion_line);
   int GetCurrentLineNo() {
