@@ -39,6 +39,7 @@ class PlcCraft {
   PLC_EXEC_ENUM exec_state_; 
 
   bool OpenJobImage(const char *file_name);
+  bool ReOpenJobImage();
   void CloseJobImage();
 
  private:

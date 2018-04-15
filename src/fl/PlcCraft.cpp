@@ -34,15 +34,35 @@ bool PlcCraft::OpenJobImage(const char *file_name) {
   return job_image_.Open(file_name);
 }
 
+bool PlcCraft::ReOpenJobImage() {
+  return job_image_.ReOpen();
+}
+
 void PlcCraft::CloseJobImage() {
   job_image_.Close();
 }
 
-void PlcCraft::AppendPlcCmdToQueue(std::vector<PlcCmd> &cmds) {
-  for (std::vector<PlcCmd>::iterator iter = cmds.begin(); iter != cmds.end();
-      iter++) {
 
-    AddCmd(*iter);
+
+void PlcCraft::LoadCraftProcesses(int motion_line) {
+  execute_error_ = 0;
+  PlcJobInfo job_info = job_image_.GetPlcJobInfo(motion_line);
+  if (job_info.operation == JOB_M07) {
+    craft_layer_ = job_info.job_layer;
+  }
+  LoadProcesses(job_info.operation);
+}
+
+void PlcCraft::LoadProcesses(int operation) {
+  switch (operation) {
+  case JOB_M07:
+    LoadM07();
+    break;
+  case JOB_M08:
+    LoadM08();
+    break;
+  default:
+    break;
   }
 }
 
@@ -75,27 +95,15 @@ void PlcCraft::LoadM08() {
   AppendPlcCmdToQueue(plc_cfg_.laser_off_);
 }
 
-void PlcCraft::LoadProcesses(int operation) {
-  switch (operation) {
-  case JOB_M07:
-    LoadM07();
-    break;
-  case JOB_M08:
-    LoadM08();
-    break;
-  default:
-    break;
+void PlcCraft::AppendPlcCmdToQueue(std::vector<PlcCmd> &cmds) {
+  for (std::vector<PlcCmd>::iterator iter = cmds.begin(); iter != cmds.end();
+      iter++) {
+
+    AddCmd(*iter);
   }
 }
 
-void PlcCraft::LoadCraftProcesses(int motion_line) {
-  execute_error_ = 0;
-  PlcJobInfo job_info = job_image_.GetPlcJobInfo(motion_line);
-  if (job_info.operation == JOB_M07) {
-    craft_layer_ = job_info.job_layer;
-  }
-  LoadProcesses(job_info.operation);
-}
+
 
 void PlcCraft::TaskAbort() {
   cmd_.cmd_id = PLC_CMD_NONE;
