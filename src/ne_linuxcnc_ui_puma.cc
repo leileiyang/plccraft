@@ -186,6 +186,9 @@ int FlTaskCommand(const PlcCmd &cmd) {
   if (cmd.cmd_id == TASK_OPEN_FILE) {
     PRINT_UI(status_mode, ">> Open file...\n");
     ret = sendProgramOpen(const_cast<char *>(cmd.args.c_str()));
+    if (ret == 0) {
+      plc_craft.OpenJobImage(const_cast<char *>(cmd.args.c_str()));
+    }
   } else if (cmd.cmd_id == TASK_PAUSE) {
     PRINT_UI(status_mode, ">> Pause\n");
     ret = sendProgramPause();
@@ -195,9 +198,13 @@ int FlTaskCommand(const PlcCmd &cmd) {
     PRINT_UI(status_mode, ">> Stop\n");
     ret = sendAbort();
     plc_craft.TaskAbort();
+    plc_craft.CloseJobImage();
   } else if (cmd.cmd_id == TASK_START) {
     PRINT_UI(status_mode, ">> Start\n");
     ret = sendProgramRun(0);
+    if (ret == 0) {
+      plc_craft.ReOpenJobImage();
+    }
     task_state = EMC_TASK_BUSY;
   } else if (cmd.cmd_id == TASK_RESUME) {
     PRINT_UI(status_mode, ">> Resume\n");
