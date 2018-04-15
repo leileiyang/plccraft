@@ -236,7 +236,7 @@ int CommandInPaused() {
       case TASK_RESUME:
       case TASK_PAUSE:
       case TASK_STOP:
-        PRINT_UI(status_mode, "echo command:%d->%c\n", cmd.cmd_id, cmd.args.c_str());
+        PRINT_UI(status_mode, "echo command:%d->%s\n", cmd.cmd_id, cmd.args.c_str());
         ret = FlTaskCommand(cmd);
         break;
       default:
@@ -253,7 +253,7 @@ int CommandInBusy() {
     switch (cmd.cmd_id) {
       case TASK_PAUSE:
       case TASK_STOP:
-        PRINT_UI(status_mode, "echo command:%d->%c\n", cmd.cmd_id, cmd.args.c_str());
+        PRINT_UI(status_mode, "echo command:%d->%s\n", cmd.cmd_id, cmd.args.c_str());
         ret = FlTaskCommand(cmd);
         break;
       default:
@@ -1223,7 +1223,7 @@ int main(int argc, char **argv)
 
 			// handle new task command from operator
 			if (plc_craft.PullCommand(cmd)) {
-        PRINT_UI(status_mode, "echo command:%d->%c\n", cmd.cmd_id, cmd.args.c_str());
+        PRINT_UI(status_mode, "echo command:%d->%s\n", cmd.cmd_id, cmd.args.c_str());
         ret = FlTaskCommand(cmd);
 				if (ret < 0) {
 					prerr("Execute Command Failed!\n");
