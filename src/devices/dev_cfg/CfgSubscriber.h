@@ -6,6 +6,8 @@
 #include "PlcCfg.h"
 #include "GasCfg.h"
 #include "FollowerCfg.h"
+#include "LaserCfg.h"
+#include "DelayCfg.h"
 
 class CfgSubscriber {
  public:
