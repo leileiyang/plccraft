@@ -55,17 +55,32 @@ class PlcCraft {
   CfgSubscriber cfg_subscriber_;
   PlcCfg plc_cfg_;
   std::vector<ProcessCfg> process_cfg_;
+  std::vector<DelayCfg> delay_cfg_;
+  std::vector<FollowerCfg> follower_cfg_;
+  std::vector<GasCfg> gas_cfg_;
   
   Gas *gas_;
   Follower *follower_;
   IODevice *output_;
 
-  int craft_layer_;
+  int current_layer_;
   PlcJobImage job_image_;
   void AppendPlcCmdToQueue(std::vector<PlcCmd> &cmds);
   void LoadProcesses(int operation);
   void LoadM07();
   void LoadM08();
+
+  double delay_timeout_;
+  double delay_left_;
+  void DelayCommand(int layer, int craft_level);
+
+  int OpenGas(int craft_level);
+  int CloseGas(int craft_level);
+  int SetPressure(int craft_level);
+
+  int FollowTo(int craft_level);
+  int IncrFollowTo(int craft_level);
+  int LiftTo();
 
 };
 
