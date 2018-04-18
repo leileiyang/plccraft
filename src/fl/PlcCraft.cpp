@@ -86,10 +86,10 @@ void PlcCraft::LoadM07() {
         AppendPlcCmdToQueue(plc_cfg_.pierce1_);
         break;
       case CRAFT_SECOND:
-        AppendPlcCmdToQueue(plc_cfg_.pierce1_);
+        AppendPlcCmdToQueue(plc_cfg_.pierce2_);
         break;
       case CRAFT_THIRD:
-        AppendPlcCmdToQueue(plc_cfg_.pierce1_);
+        AppendPlcCmdToQueue(plc_cfg_.pierce3_);
         break;
       default:
         break;
@@ -107,6 +107,10 @@ void PlcCraft::AppendPlcCmdToQueue(std::vector<PlcCmd> &cmds) {
 
     AddCmd(*iter);
   }
+}
+
+void PlcCraft::AddCmd(const PlcCmd &command) {
+  cmds_.push(command);
 }
 
 
@@ -156,10 +160,6 @@ void PlcCraft::TaskAbort() {
   gas_->Close();
 }
 
-void PlcCraft::AddCmd(const PlcCmd &command) {
-  cmds_.push(command);
-}
-
 PLC_STATUS PlcCraft::IssueCmd() {
   if (DoCmd() != 0) {
     execute_error_ = 1;
@@ -180,6 +180,10 @@ PLC_EXEC_ENUM PlcCraft::CheckPostCondition() {
     case DELAY_STAY_FIRST:
     case DELAY_STAY_SECOND:
     case DELAY_STAY_THIRD:
+    case DELAY_BLOW_CUTTING:
+    case DELAY_BLOW_FIRST:
+    case DELAY_BLOW_SECOND:
+    case DELAY_BLOW_THIRD:
       return PLC_EXEC_WAITING_FOR_DELAY;
       break;
     default:
@@ -231,7 +235,13 @@ int PlcCraft::DoCmd() {
       case DELAY_STAY_FIRST:
       case DELAY_STAY_SECOND:
       case DELAY_STAY_THIRD:
-
+        retval = StayCommand(cmd_.cmd_id - DELAY_STAY_CUTTING);
+        break;
+      case DELAY_BLOW_CUTTING:
+      case DELAY_BLOW_FIRST:
+      case DELAY_BLOW_SECOND:
+      case DELAY_BLOW_THIRD:
+        retval = BlowDelayCommand(cmd_.cmd_id - DELAY_BLOW_CUTTING);
         break;
       default:
         break;
@@ -239,6 +249,18 @@ int PlcCraft::DoCmd() {
     DetachLastCmd();
   }
   return retval;
+}
+
+void PlcCraft::DetachLastCmd() {
+  cmds_.pop();
+}
+
+const PlcCmd PlcCraft:: GetNextCmd() {
+  return cmds_.front();
+}
+
+const std::size_t PlcCraft::GetCmdQueueSize() {
+  return cmds_.size();
 }
 
 int PlcCraft::OpenGas(int craft_level) {
@@ -300,16 +322,20 @@ int PlcCraft::LiftTo() {
   }
 }
 
-void PlcCraft::DetachLastCmd() {
-  cmds_.pop();
+int PlcCraft::BlowDelayCommand(int craft_level) {
+  if (delay_cfg_[current_layer_].blow_enable_[craft_level]) {
+    DelayCommand(delay_cfg_[current_layer_].laser_off_blow_time_[craft_level]);
+  }
+  return 0;
 }
 
-const PlcCmd PlcCraft:: GetNextCmd() {
-  return cmds_.front();
+int PlcCraft::StayCommand(int craft_level) {
+  return DelayCommand(delay_cfg_[current_layer_].stay_[craft_level]);
 }
 
-const std::size_t PlcCraft::GetCmdQueueSize() {
-  return cmds_.size();
+int PlcCraft::DelayCommand(double time) {
+  delay_timeout_ = etime() + time; 
+  return 0;
 }
 
 void PlcCraft::Update() {
@@ -337,7 +363,6 @@ void PlcCraft::UpdateDeviceCfg() {
   cfg_subscriber_.UpdatePlcCfg(plc_cfg_);
   cfg_subscriber_.AckAnyReceived();
 }
-
 
 int PlcCraft::PullCommand(PlcCmd &cmd) {
   return cfg_subscriber_.PullCommand(cmd);

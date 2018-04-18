@@ -72,7 +72,9 @@ class PlcCraft {
 
   double delay_timeout_;
   double delay_left_;
-  void DelayCommand(int layer, int craft_level);
+  int DelayCommand(double time);
+  int BlowDelayCommand(int craft_level);
+  int StayCommand(int craft_level);
 
   int OpenGas(int craft_level);
   int CloseGas(int craft_level);
