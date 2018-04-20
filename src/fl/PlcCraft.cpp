@@ -31,22 +31,22 @@ bool PlcCraft::Initialize() {
 
 
 bool PlcCraft::OpenJobImage(const char *file_name) {
-  return job_image_.Open(file_name);
+  return job_seeker_.Open(file_name);
 }
 
 bool PlcCraft::ReOpenJobImage() {
-  return job_image_.ReOpen();
+  return job_seeker_.ReOpen();
 }
 
 void PlcCraft::CloseJobImage() {
-  job_image_.Close();
+  job_seeker_.Close();
 }
 
 
 
 void PlcCraft::LoadCraftProcesses(int motion_line) {
   execute_error_ = 0;
-  PlcJobInfo job_info = job_image_.GetPlcJobInfo(motion_line);
+  PlcJobInfo job_info = job_seeker_.GetPlcJobInfo(motion_line);
   if (job_info.operation == JOB_M07) {
     craft_layer_ = job_info.job_layer;
   }

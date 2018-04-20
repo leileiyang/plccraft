@@ -1,6 +1,6 @@
 Import('env')
 objs = []
 objs.append(env.Object(["PlcCraft.cpp",
-                        "PlcJobImage.cpp"]))
+                        "JobSeeker.cpp"]))
 
 Return('objs')

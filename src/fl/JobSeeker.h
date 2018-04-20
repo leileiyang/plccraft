@@ -13,11 +13,12 @@ enum JOB_OPERATION {
 struct PlcJobInfo {
   int operation;
   int job_layer;
+  double move_distance;
 };
 
-class PlcJobImage {
+class JobSeeker {
  public:
-  PlcJobImage(): file_name_(""), fp_(NULL), current_line_(0) {}
+  JobSeeker(): file_name_(""), fp_(NULL), current_line_(0) {}
   bool Open(const char *file_name);
   bool ReOpen();
   void Close();

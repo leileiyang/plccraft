@@ -1,13 +1,13 @@
-#include "PlcJobImage.h"
+#include "JobSeeker.h"
 
 #include "GCodeBase.h"
 
-bool PlcJobImage::Open(const char *file_name) {
+bool JobSeeker::Open(const char *file_name) {
   file_name_ = std::string(file_name);
   return ReOpen();
 }
 
-bool PlcJobImage::ReOpen() {
+bool JobSeeker::ReOpen() {
   if((fp_ = fopen(file_name_.c_str(), "w")) == NULL) {
     return false;
   }
@@ -15,7 +15,7 @@ bool PlcJobImage::ReOpen() {
   return true;
 }
 
-void PlcJobImage::Close() {
+void JobSeeker::Close() {
   if (fp_) {
     fclose(fp_);
     fp_ = NULL;
@@ -24,7 +24,7 @@ void PlcJobImage::Close() {
   current_line_ = 0;
 }
 
-void PlcJobImage::LocateToGivenLine(int line) {
+void JobSeeker::LocateToGivenLine(int line) {
   if (!fp_) {
     return;
   }
@@ -35,7 +35,7 @@ void PlcJobImage::LocateToGivenLine(int line) {
   current_line_ = line;
 }
 
-PlcJobInfo PlcJobImage::SeekNextJobOperation() {
+PlcJobInfo JobSeeker::SeekNextJobOperation() {
   char buf[256] = {0};
   PlcJobInfo job_info;
   while (fgets(buf, 256, fp_)) {
@@ -52,7 +52,7 @@ PlcJobInfo PlcJobImage::SeekNextJobOperation() {
   return job_info;
 }
 
-PlcJobInfo PlcJobImage::GetPlcJobInfo(int motion_line) {
+PlcJobInfo JobSeeker::GetPlcJobInfo(int motion_line) {
   LocateToGivenLine(motion_line);
   return SeekNextJobOperation();
 }
