@@ -8,6 +8,7 @@
 #include <boost/archive/text_iarchive.hpp>
 
 #include <zmq.h>
+#include <time.h>
 
 #include "../PlcCfg.h"
 
@@ -37,8 +38,14 @@ int main() {
   cmd.args = "Hello World";
   oa << cmd;
 
-  const char *content = ofs.str().c_str();
-  int size = SendMessage(requester, content, 0);
+  clock_t t = clock();
+  //const char *content = ofs.str().c_str();
+  //int size = SendMessage(requester, content, 0);
+  zmq_msg_t msg;
+  zmq_msg_init_size(&msg, ofs.str().length());
+  memcpy(zmq_msg_data(&msg), ofs.str().c_str(), ofs.str().length());
+  int size = zmq_msg_send(&msg, requester, 0);
+  zmq_msg_close(&msg);
   if (size == -1) {
     return -1;
   }
@@ -52,6 +59,9 @@ int main() {
   } else if (rc == -1) {
     return -3;
   } else {
+    t = clock() - t;
+    double time = ((double)t) / CLOCKS_PER_SEC;
+    printf("time:%f\n", time);
     return 0;
   }
   return 0;
