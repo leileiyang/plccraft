@@ -1,44 +1,35 @@
 #ifndef GCODEBASE_H_
 #define GCODEBASE_H_
 
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-int IsMCmd(const char *buf, char c) {
-  if (strlen(buf) < 3) {
-    return 0;
-  }
-  return buf[0] == 'M' && buf[1] == '0' && buf[2] == c;
-}
+struct Point {
+  double x;
+  double y;
+  double z;
+};
 
-int IsM07(const char *buf) {
-  return IsMCmd(buf, '7');
-}
+int IsCmd(const char *buf, char cmd_type, char cmd_index);
 
-int IsM08(const char *buf) {
-  return IsMCmd(buf, '8');
-}
+int IsMCmd(const char *buf, char c);
 
-int IsM02(const char *buf) {
-  return IsMCmd(buf, '2');
-}
+int IsM07(const char *buf);
 
-int GetLayerIndex(const char *buf) {
-  // M07 command: M07 U1
-  int index = 0;
-  char m[20] = {0};
-  char u[20] = {0};
-  sscanf(buf, "%s %s", m, u);
-  if (strlen(u)) {
-    index = atoi(&u[1]);
-  }
-  return index;
-}
+int IsM08(const char *buf);
+
+int IsM02(const char *buf);
+
+int IsMoving(const char *buf);
+
+int IsCuttingCurve(const char *buf);
+
+int GetLayerIndex(const char *buf);
+
+Point ExtractPosition(const char *buf);
+
+double PointsDistance(const Point &p1, const Point &p2);
 
 #ifdef __cplusplus
 }

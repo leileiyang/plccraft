@@ -9,7 +9,7 @@
 #include "../devices/gpio/IODevice.h"
 #include "../devices/dev_cfg/CfgSubscriber.h"
 
-#include "PlcJobImage.h"
+#include "JobSeeker.h"
 
 enum PLC_EXEC_ENUM {
   PLC_EXEC_ERROR = 1,
@@ -64,7 +64,7 @@ class PlcCraft {
   IODevice *output_;
 
   int current_layer_;
-  PlcJobImage job_image_;
+  JobSeeker job_seeker_;
   void AppendPlcCmdToQueue(std::vector<PlcCmd> &cmds);
   void LoadProcesses(int operation);
   void LoadM07();

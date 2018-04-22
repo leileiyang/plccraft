@@ -1,7 +1,7 @@
 Import('env')
 objs = []
 objs.append(env.Object(["PlcCraft.cpp",
-                        "PlcJobImage.cpp"],
-                        CPPPATH=['/usr/include/linuxcnc', '.']))
+                        "GCodeBase.cpp",
+                        "JobSeeker.cpp"]))
 
 Return('objs')
