@@ -10,6 +10,7 @@
 #include "../devices/dev_cfg/CfgSubscriber.h"
 
 #include "JobSeeker.h"
+#include "JobLoader.h"
 
 enum PLC_EXEC_ENUM {
   PLC_EXEC_ERROR = 1,
@@ -53,8 +54,6 @@ class PlcCraft {
   PLC_EXEC_ENUM CheckPostCondition();
 
   CfgSubscriber cfg_subscriber_;
-  PlcCfg plc_cfg_;
-  std::vector<ProcessCfg> process_cfg_;
   std::vector<DelayCfg> delay_cfg_;
   std::vector<FollowerCfg> follower_cfg_;
   std::vector<GasCfg> gas_cfg_;
@@ -65,10 +64,7 @@ class PlcCraft {
 
   int current_layer_;
   JobSeeker job_seeker_;
-  void AppendPlcCmdToQueue(std::vector<PlcCmd> &cmds);
-  void LoadProcesses(int operation);
-  void LoadM07();
-  void LoadM08();
+  JobLoader job_loader_;
 
   double delay_timeout_;
   double delay_left_;

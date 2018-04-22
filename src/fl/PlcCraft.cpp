@@ -5,7 +5,6 @@
 
 PlcCraft::PlcCraft(): current_layer_(0), status_(PLC_DONE),
     exec_state_(PLC_EXEC_DONE), execute_error_(0),
-    process_cfg_(CRAFT_LAYERS, ProcessCfg()),
     delay_cfg_(CRAFT_LAYERS, DelayCfg()),
     follower_cfg_(CRAFT_LAYERS, FollowerCfg()),
     gas_cfg_(CRAFT_LAYERS, GasCfg()),
@@ -48,65 +47,13 @@ void PlcCraft::CloseJobImage() {
   job_seeker_.Close();
 }
 
-
-
 void PlcCraft::LoadCraftProcesses(int motion_line) {
   execute_error_ = 0;
   PlcJobInfo job_info = job_seeker_.GetPlcJobInfo(motion_line);
   if (job_info.operation == JOB_M07) {
     current_layer_ = job_info.job_layer;
   }
-  LoadProcesses(job_info.operation);
-}
-
-void PlcCraft::LoadProcesses(int operation) {
-  switch (operation) {
-  case JOB_M07:
-    LoadM07();
-    break;
-  case JOB_M08:
-    LoadM08();
-    break;
-  default:
-    break;
-  }
-}
-
-void PlcCraft::LoadM07() {
-  if (current_layer_ == STRIPING_LAYER_INDEX) {
-    AppendPlcCmdToQueue(plc_cfg_.striping_);
-  } else if (current_layer_ == COOLING_LAYER_INDEX) {
-    AppendPlcCmdToQueue(plc_cfg_.cooling_);
-  } else {
-    switch (process_cfg_[current_layer_].craft_level) {
-      case CRAFT_CUTTING:
-        AppendPlcCmdToQueue(plc_cfg_.cutting_);
-        break;
-      case CRAFT_FIRST:
-        AppendPlcCmdToQueue(plc_cfg_.pierce1_);
-        break;
-      case CRAFT_SECOND:
-        AppendPlcCmdToQueue(plc_cfg_.pierce2_);
-        break;
-      case CRAFT_THIRD:
-        AppendPlcCmdToQueue(plc_cfg_.pierce3_);
-        break;
-      default:
-        break;
-    }
-  }
-}
-
-void PlcCraft::LoadM08() {
-  AppendPlcCmdToQueue(plc_cfg_.laser_off_);
-}
-
-void PlcCraft::AppendPlcCmdToQueue(std::vector<PlcCmd> &cmds) {
-  for (std::vector<PlcCmd>::iterator iter = cmds.begin(); iter != cmds.end();
-      iter++) {
-
-    AddCmd(*iter);
-  }
+  job_loader_.LoadProcesses(job_info, cmds_);
 }
 
 void PlcCraft::AddCmd(const PlcCmd &command) {
@@ -360,7 +307,7 @@ void PlcCraft::Update() {
 void PlcCraft::UpdateDeviceCfg() {
   cfg_subscriber_.UpdateGasCfg(gas_cfg_);
   cfg_subscriber_.UpdateFollowerCfg(follower_cfg_);
-  cfg_subscriber_.UpdatePlcCfg(plc_cfg_);
+  cfg_subscriber_.UpdatePlcCfg(job_loader_.plc_cfg_);
   cfg_subscriber_.AckAnyReceived();
 }
 
