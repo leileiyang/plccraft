@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <string>
 
+#include "GCodeBase.h"
+
 enum JOB_OPERATION {
   JOB_NONE,
   JOB_M07,
@@ -31,9 +33,11 @@ class JobSeeker {
   std::string file_name_; 
   FILE *fp_;
   int current_line_;
+  Point current_position_;
 
   void LocateToGivenLine(int line);
   PlcJobInfo SeekNextJobOperation();
+  double PeekNextMovingDistance();
 };
 
 #endif // PLCJOBIMAGE_H_
