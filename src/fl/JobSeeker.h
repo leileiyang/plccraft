@@ -1,23 +1,15 @@
-#ifndef PLCJOBIMAGE_H_
-#define PLCJOBIMAGE_H_
+#ifndef JOBSEEKER_H_
+#define JOBSEEKER_H_ 
 
 #include <stdio.h>
 #include <string>
 
-enum JOB_OPERATION {
-  JOB_NONE,
-  JOB_M07,
-  JOB_M08,
-};
+#include "FlBase.h"
+#include "GCodeBase.h"
 
-struct PlcJobInfo {
-  int operation;
-  int job_layer;
-};
-
-class PlcJobImage {
+class JobSeeker {
  public:
-  PlcJobImage(): file_name_(""), fp_(NULL), current_line_(0) {}
+  JobSeeker(): file_name_(""), fp_(NULL), current_line_(0) {}
   bool Open(const char *file_name);
   bool ReOpen();
   void Close();
@@ -30,9 +22,11 @@ class PlcJobImage {
   std::string file_name_; 
   FILE *fp_;
   int current_line_;
+  Point current_position_;
 
   void LocateToGivenLine(int line);
   PlcJobInfo SeekNextJobOperation();
+  double PeekNextMovingDistance();
 };
 
-#endif // PLCJOBIMAGE_H_
+#endif // JOBSEEKER_H_

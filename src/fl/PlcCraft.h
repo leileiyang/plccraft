@@ -9,7 +9,7 @@
 #include "../devices/gpio/IODevice.h"
 #include "../devices/dev_cfg/CfgSubscriber.h"
 
-#include "PlcJobImage.h"
+#include "JobSeeker.h"
 
 enum PLC_EXEC_ENUM {
   PLC_EXEC_ERROR = 1,
@@ -55,17 +55,34 @@ class PlcCraft {
   CfgSubscriber cfg_subscriber_;
   PlcCfg plc_cfg_;
   std::vector<ProcessCfg> process_cfg_;
+  std::vector<DelayCfg> delay_cfg_;
+  std::vector<FollowerCfg> follower_cfg_;
+  std::vector<GasCfg> gas_cfg_;
   
   Gas *gas_;
   Follower *follower_;
   IODevice *output_;
 
-  int craft_layer_;
-  PlcJobImage job_image_;
+  int current_layer_;
+  JobSeeker job_seeker_;
   void AppendPlcCmdToQueue(std::vector<PlcCmd> &cmds);
   void LoadProcesses(int operation);
   void LoadM07();
   void LoadM08();
+
+  double delay_timeout_;
+  double delay_left_;
+  int DelayCommand(double time);
+  int BlowDelayCommand(int craft_level);
+  int StayCommand(int craft_level);
+
+  int OpenGas(int craft_level);
+  int CloseGas(int craft_level);
+  int SetPressure(int craft_level);
+
+  int FollowTo(int craft_level);
+  int IncrFollowTo(int craft_level);
+  int LiftTo();
 
 };
 

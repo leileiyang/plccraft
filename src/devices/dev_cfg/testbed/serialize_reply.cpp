@@ -25,14 +25,15 @@ int main() {
   void *responder = zmq_socket(ctx, ZMQ_REP);
   zmq_bind(responder, "tcp://*:5555");
 
+  do {
   zmq_msg_t msg;
   int rc = zmq_msg_init(&msg);
   assert(rc == 0);
   rc = zmq_msg_recv(&msg, responder, ZMQ_DONTWAIT);
   if (rc == -1 && errno == EAGAIN) {
-    ;
+    continue;
   } else if (rc == -1) {
-    ;
+    break;
   }
 
   std::string content;
@@ -46,6 +47,9 @@ int main() {
 
   // reply
   SendMessage(responder, "Received", 0);
+  std::cout << "cmd_id: " << cmd.cmd_id << std::endl;
+  std::cout << "args: " << cmd.args << std::endl;
+  } while (true);
 
-  return rc;
+  return 0;
 }
