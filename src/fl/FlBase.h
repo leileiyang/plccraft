@@ -8,4 +8,16 @@ enum PLC_STATUS {
   PLC_ERROR = 3
 };
 
+enum JOB_OPERATION {
+  JOB_NONE,
+  JOB_M07,
+  JOB_M08,
+};
+
+struct PlcJobInfo {
+  int operation;
+  int job_layer;
+  double move_distance;
+};
+
 #endif
