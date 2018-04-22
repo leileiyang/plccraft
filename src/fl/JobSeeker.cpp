@@ -83,7 +83,7 @@ double JobSeeker::PeekNextMovingDistance() {
   while (fgets(buf, 256, fp_)) {
     if (IsMoving(buf)) {
       Point end_point = ExtractPosition(buf);
-      distance = PointsDistance(current_position, end_point);
+      distance = PointsDistance(current_position_, end_point);
       break;
     } else if (IsCuttingCurve(buf)) {
       break;

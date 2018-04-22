@@ -1,5 +1,5 @@
-#ifndef PLCJOBIMAGE_H_
-#define PLCJOBIMAGE_H_
+#ifndef JOBSEEKER_H_
+#define JOBSEEKER_H_ 
 
 #include <stdio.h>
 #include <string>
@@ -40,4 +40,4 @@ class JobSeeker {
   double PeekNextMovingDistance();
 };
 
-#endif // PLCJOBIMAGE_H_
+#endif // JOBSEEKER_H_
