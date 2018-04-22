@@ -1,7 +1,6 @@
 Import('env')
 objs = []
-objs.append(env.Object(["PlcCraft.cpp",
-                        "GCodeBase.cpp",
-                        "JobSeeker.cpp"]))
+objs.append(env.Object(["PlcCraft.cpp", "GCodeBase.cpp", "JobSeeker.cpp"],
+                       CPPPATH=['/usr/include/linuxcnc', '.']))
 
 Return('objs')
