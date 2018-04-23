@@ -45,6 +45,9 @@ void JobSeeker::LocateToGivenLine(int line) {
   if (!fp_) {
     return;
   }
+  if (current_line_ >= line) {
+    return;
+  }
   char buf[256] = {0};
   for (int i = current_line_; i < line; i++) {
     fgets(buf, 256, fp_);

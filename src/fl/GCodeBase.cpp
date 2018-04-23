@@ -6,13 +6,11 @@
 #include <math.h>
 
 int IsCmd(const char *buf, char cmd_type, char cmd_index) {
-  char cmd[10] = {0};
-  sscanf(buf, "%s", cmd);
-  if (strlen(cmd) < 3) {
-    return cmd[0] == cmd_type && cmd[1] == cmd_index;
-  } else {
-    return cmd[0] == cmd_type && cmd[1] == '0' && cmd[2] == cmd_index;
-  }
+  char cmd = 0; 
+  int cmd_value = 0;
+  sscanf(buf, "%c%d", &cmd, &cmd_value);
+
+  return cmd == cmd_type && cmd_value == cmd_index;
 }
 
 int IsMCmd(const char *buf, char c) {
@@ -20,23 +18,23 @@ int IsMCmd(const char *buf, char c) {
 }
 
 int IsM07(const char *buf) {
-  return IsMCmd(buf, '7');
+  return IsMCmd(buf, 107);
 }
 
 int IsM08(const char *buf) {
-  return IsMCmd(buf, '8');
+  return IsMCmd(buf, 108);
 }
 
 int IsM02(const char *buf) {
-  return IsMCmd(buf, '2');
+  return IsMCmd(buf, 2);
 }
 
 int IsMoving(const char *buf) {
-  return IsCmd(buf, 'G', '0');
+  return IsCmd(buf, 'G', 0);
 }
 
 int IsCuttingCurve(const char *buf) {
-  return IsCmd(buf, 'G', '1') || IsCmd(buf, 'G', '2') || IsCmd(buf, 'G', '3');
+  return IsCmd(buf, 'G', 1) || IsCmd(buf, 'G', 2) || IsCmd(buf, 'G', 3);
 }
 
 int GetLayerIndex(const char *buf) {
