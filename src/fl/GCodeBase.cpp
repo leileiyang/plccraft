@@ -13,16 +13,16 @@ int IsCmd(const char *buf, char cmd_type, char cmd_index) {
   return cmd == cmd_type && cmd_value == cmd_index;
 }
 
-int IsMCmd(const char *buf, char c) {
-  return IsCmd(buf, 'M', c);
+int IsMCmd(const char *buf, char cmd_index) {
+  return IsCmd(buf, 'M', cmd_index);
 }
 
 int IsM07(const char *buf) {
-  return IsMCmd(buf, 107);
+  return IsMCmd(buf, 7);
 }
 
 int IsM08(const char *buf) {
-  return IsMCmd(buf, 108);
+  return IsMCmd(buf, 8);
 }
 
 int IsM02(const char *buf) {
@@ -38,14 +38,10 @@ int IsCuttingCurve(const char *buf) {
 }
 
 int GetLayerIndex(const char *buf) {
-  // M07 command: M07 U1
+  // M07 command: M07 (1) 
   int index = 0;
   char m[20] = {0};
-  char u[20] = {0};
-  sscanf(buf, "%s %s", m, u);
-  if (strlen(u)) {
-    index = atoi(&u[1]);
-  }
+  sscanf(buf, "%s (%d)", m, &index);
   return index;
 }
 
