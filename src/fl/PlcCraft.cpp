@@ -35,15 +35,15 @@ bool PlcCraft::Initialize() {
 
 
 
-bool PlcCraft::OpenJobImage(const char *file_name) {
+bool PlcCraft::ActivateJobSeeker(const char *file_name) {
   return job_seeker_.Open(file_name);
 }
 
-bool PlcCraft::ReOpenJobImage() {
+bool PlcCraft::ActivateJobSeeker() {
   return job_seeker_.ReOpen();
 }
 
-void PlcCraft::CloseJobImage() {
+void PlcCraft::DeactivateJobSeeker() {
   job_seeker_.Close();
 }
 

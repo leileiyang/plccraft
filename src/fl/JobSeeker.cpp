@@ -12,7 +12,7 @@ bool JobSeeker::Open(const char *file_name) {
 }
 
 bool JobSeeker::ReOpen() {
-  if((fp_ = fopen(file_name_.c_str(), "w")) == NULL) {
+  if((fp_ = fopen(file_name_.c_str(), "r")) == NULL) {
     return false;
   }
   current_position_.x = 0;

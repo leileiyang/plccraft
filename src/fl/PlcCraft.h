@@ -39,9 +39,9 @@ class PlcCraft {
   PLC_STATUS status_;
   PLC_EXEC_ENUM exec_state_; 
 
-  bool OpenJobImage(const char *file_name);
-  bool ReOpenJobImage();
-  void CloseJobImage();
+  bool ActivateJobSeeker(const char *file_name);
+  bool ActivateJobSeeker();
+  void DeactivateJobSeeker();
 
  private:
   int execute_error_;
