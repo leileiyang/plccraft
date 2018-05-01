@@ -10,9 +10,9 @@
 
 class GasCfg {
  public:
-  GasCfg(): gas_(CRAFT_LEVELS, VACUO), pressure_(CRAFT_LEVELS, 0.){}
+  GasCfg(): gas_(CRAFT_LEVELS, 0), pressure_(CRAFT_LEVELS, 0.){}
 
-  std::vector<GasType> gas_;
+  std::vector<int> gas_;
   std::vector<double> pressure_;
   void Show() {
     for (int i = 0; i < CRAFT_LEVELS; i++) {
