@@ -48,19 +48,7 @@ int GetLayerIndex(const char *buf) {
 Point ExtractPosition(const char *buf) {
   Point point = {0, 0, 0};
   char g[20] = {0};
-  char x[20] = {0};
-  char y[20] = {0};
-  sscanf(buf, "%s %s %s", g, x, y);
-  if (strlen(x)) {
-    if (x[0] == 'X') {
-      point.x = atof(&x[1]);
-    } else if (x[0] == 'Y') {
-      point.y = atof(&x[1]);
-    }
-  }
-  if (strlen(y)) {
-    point.y = atof(&y[1]);
-  }
+  sscanf(buf, "%s X%lf Y%lf", g, &point.x, &point.y);
   return point;
 }
 
