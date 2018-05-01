@@ -12,7 +12,7 @@ bool JobSeeker::Open(const char *file_name) {
 }
 
 bool JobSeeker::ReOpen() {
-  if((fp_ = fopen(file_name_.c_str(), "w")) == NULL) {
+  if((fp_ = fopen(file_name_.c_str(), "r")) == NULL) {
     return false;
   }
   current_position_.x = 0;
@@ -43,6 +43,9 @@ PlcJobInfo JobSeeker::GetPlcJobInfo(int motion_line) {
 
 void JobSeeker::LocateToGivenLine(int line) {
   if (!fp_) {
+    return;
+  }
+  if (current_line_ >= line) {
     return;
   }
   char buf[256] = {0};

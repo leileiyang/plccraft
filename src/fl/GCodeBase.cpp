@@ -6,67 +6,49 @@
 #include <math.h>
 
 int IsCmd(const char *buf, char cmd_type, char cmd_index) {
-  char cmd[10] = {0};
-  sscanf(buf, "%s", cmd);
-  if (strlen(cmd) < 3) {
-    return cmd[0] == cmd_type && cmd[1] == cmd_index;
-  } else {
-    return cmd[0] == cmd_type && cmd[1] == '0' && cmd[2] == cmd_index;
-  }
+  char cmd = 0; 
+  int cmd_value = 0;
+  sscanf(buf, "%c%d", &cmd, &cmd_value);
+
+  return cmd == cmd_type && cmd_value == cmd_index;
 }
 
-int IsMCmd(const char *buf, char c) {
-  return IsCmd(buf, 'M', c);
+int IsMCmd(const char *buf, char cmd_index) {
+  return IsCmd(buf, 'M', cmd_index);
 }
 
 int IsM07(const char *buf) {
-  return IsMCmd(buf, '7');
+  return IsMCmd(buf, 7);
 }
 
 int IsM08(const char *buf) {
-  return IsMCmd(buf, '8');
+  return IsMCmd(buf, 8);
 }
 
 int IsM02(const char *buf) {
-  return IsMCmd(buf, '2');
+  return IsMCmd(buf, 2);
 }
 
 int IsMoving(const char *buf) {
-  return IsCmd(buf, 'G', '0');
+  return IsCmd(buf, 'G', 0);
 }
 
 int IsCuttingCurve(const char *buf) {
-  return IsCmd(buf, 'G', '1') || IsCmd(buf, 'G', '2') || IsCmd(buf, 'G', '3');
+  return IsCmd(buf, 'G', 1) || IsCmd(buf, 'G', 2) || IsCmd(buf, 'G', 3);
 }
 
 int GetLayerIndex(const char *buf) {
-  // M07 command: M07 U1
+  // M07 command: M07 (1) 
   int index = 0;
   char m[20] = {0};
-  char u[20] = {0};
-  sscanf(buf, "%s %s", m, u);
-  if (strlen(u)) {
-    index = atoi(&u[1]);
-  }
+  sscanf(buf, "%s (%d)", m, &index);
   return index;
 }
 
 Point ExtractPosition(const char *buf) {
   Point point = {0, 0, 0};
   char g[20] = {0};
-  char x[20] = {0};
-  char y[20] = {0};
-  sscanf(buf, "%s %s %s", g, x, y);
-  if (strlen(x)) {
-    if (x[0] == 'X') {
-      point.x = atof(&x[1]);
-    } else if (x[0] == 'Y') {
-      point.y = atof(&x[1]);
-    }
-  }
-  if (strlen(y)) {
-    point.y = atof(&y[1]);
-  }
+  sscanf(buf, "%s X%lf Y%lf", g, &point.x, &point.y);
   return point;
 }
 

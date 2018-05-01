@@ -13,7 +13,7 @@ struct Point {
 
 int IsCmd(const char *buf, char cmd_type, char cmd_index);
 
-int IsMCmd(const char *buf, char c);
+int IsMCmd(const char *buf, char cmd_index);
 
 int IsM07(const char *buf);
 

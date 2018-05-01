@@ -10,5 +10,6 @@ for subdir in ['fl', 'devices']:
 
 src_files = src_files + objs
 env.Program('fltask', src_files, 
-        LIBS=['rt', 'm', 'nml', 'linuxcncini', 'linuxcnc', 'boost_serialization', 'zmq'],
+        LIBS=['rt', 'm', 'nml', 'linuxcncini', 'linuxcnc', 'boost_serialization', 'zmq', 'gcodebase'],
+        LIBPATH='fl/',
         CPPPATH=['/usr/include/linuxcnc', '.'])
