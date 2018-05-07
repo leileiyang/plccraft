@@ -89,6 +89,7 @@ enum PLC_CMD_ENUM {
   LHC_PROGRESSIVE_THIRD = 127,
 
   LHC_LIFT = 128,
+  LHC_Z_AXIS_HOLD = 129,
 
   // Laser Command
   LASER_ON = 140,
