@@ -12,7 +12,7 @@ class DelayCfg {
  public:
   DelayCfg(): stay_(CRAFT_LEVELS, 3000),
       laser_off_blow_time_(CRAFT_LEVELS, 500),
-      blow_enable_(false) {}
+      blow_enable_(CRAFT_LEVELS, false) {}
 
   std::vector<double> stay_;
   std::vector<double> laser_off_blow_time_;
@@ -26,7 +26,6 @@ class DelayCfg {
 
     }
   }
-
 };
 
 namespace boost {
