@@ -235,6 +235,9 @@ int CommandInPaused() {
   if (plc_craft.PullCommand(cmd)) {
     switch (cmd.cmd_id) {
       case TASK_RESUME:
+        if (task_state != EMC_TASK_PAUSED) {
+          break;
+        }
       case TASK_PAUSE:
       case TASK_STOP:
         PRINT_UI(status_mode, "echo command:%d->%s\n", cmd.cmd_id, cmd.args.c_str());
