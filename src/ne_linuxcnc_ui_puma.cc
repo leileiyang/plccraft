@@ -79,6 +79,7 @@ extern "C" {
 #include <vector>
 
 #include "fl/PlcCraft.h"
+#include "devices/dev_cfg/TaskStatus.h"
 
 
 // a "few" globals to control emc status printout
@@ -89,6 +90,7 @@ static int print_status_str = 1;	// if non-zero, allow printing "status_str[]"
 static int cmd_prompt_shown = 0;	// if non-zero, cmd prompt was already displayed
 static int task_state = 0;
 static PlcCraft plc_craft; 
+static TaskStatus task_status;
 
 // show status string header; enable printing global "status_str[]"
 #define PRINT_STAT_STR_PREP(mode) do { \
@@ -222,6 +224,8 @@ int FlTaskCommand(const PlcCmd &cmd) {
       PRINT_UI(status_mode, ">> Set Manual\n");
       ret = sendManual();
     }
+  } else if (cmd.cmd_id == TASK_MDI_CMD) {
+    ret = sendMdiCmd(cmd.args.c_str());
   }
   if (ret < 0) {
     task_state = EMC_TASK_ERROR;
@@ -267,6 +271,11 @@ int CommandInBusy() {
   return ret;
 }
 
+static int UpdateTaskStatus() {
+  task_status.mk_status_ = emcStatus->status;
+  task_status.mk_task_mode_ = emcStatus->task.mode;
+  task_status.mk_echo_serial_number_ = emcStatus->echo_serial_number;
+}
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -1249,6 +1258,7 @@ prompt_again:
 			prerr("Unkown UI_INTERP_STATE\n");
 			goto exit;
 		}
+    // task status report
 
 	}			// while(!done)
 
