@@ -314,3 +314,7 @@ void PlcCraft::UpdateDeviceCfg() {
 int PlcCraft::PullCommand(PlcCmd &cmd) {
   return cfg_subscriber_.PullCommand(cmd);
 }
+
+int PlcCraft::UpdateTaskStatus(const TaskStatus &task_status) {
+  return cfg_subscriber_.UpdateTaskStatus(task_status);
+}

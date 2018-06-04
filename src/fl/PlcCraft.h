@@ -35,6 +35,7 @@ class PlcCraft {
   PLC_STATUS Execute();
 
   int PullCommand(PlcCmd &cmd);
+  int UpdateTaskStatus(const TaskStatus &task_status);
 
   PLC_STATUS status_;
   PLC_EXEC_ENUM exec_state_; 

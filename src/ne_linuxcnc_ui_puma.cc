@@ -275,6 +275,7 @@ static int UpdateTaskStatus() {
   task_status.mk_status_ = emcStatus->status;
   task_status.mk_task_mode_ = emcStatus->task.mode;
   task_status.mk_echo_serial_number_ = emcStatus->echo_serial_number;
+  return plc_craft.UpdateTaskStatus(task_status);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -635,6 +636,12 @@ static int set_runtmeStatusStr(void)
 		 MDIQUEUE_STR_WIDTH, queue, INTERPSTATE_STR_WIDTH, interpstate,
 		 COORDSTYPE_STR_WIDTH, coordtype, x, y, z, a, b, c);
 
+  task_status.x_ = x;
+  task_status.y_ = y;
+  task_status.z_ = z;
+  task_status.a_ = a;
+  task_status.b_ = b;
+  task_status.c_ = c;
 	return 0;
 }
 
@@ -1259,6 +1266,7 @@ prompt_again:
 			goto exit;
 		}
     // task status report
+    UpdateTaskStatus();
 
 	}			// while(!done)
 

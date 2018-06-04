@@ -40,13 +40,17 @@ int CfgSubscriber::InitCfgSocket() {
   // ack responder
   ack_responder_ = zmq_socket(context_, ZMQ_REQ);
   zmq_connect(ack_responder_, "tcp://10.1.0.165:6000");
+  
+  // task status publisher
+  status_publisher_ = zmq_socket(context_, ZMQ_PUB);
+  zmq_bind(status_publisher_, "tcp://*:6002");
 
   // commmand responder socket
   responder_ = zmq_socket(context_, ZMQ_REP);
   zmq_bind(responder_, "tcp://*:5555");
 
   if (gas_subscriber_ && lhc_subscriber_ && plc_subscriber_&& ack_responder_ &&
-      responder_) {
+      responder_ && status_publisher_) {
 
     return 0;
   }
@@ -85,6 +89,11 @@ int CfgSubscriber::ZmqRecvx(void *socket, std::string &identity, std::string &la
   return part_no;
 }
 
+#define UNSERIALIZE_CFG(CFG) \
+  std::istringstream ifs(content); \
+  boost::archive::text_iarchive ia(ifs); \
+  ia >> CFG
+
 int CfgSubscriber::PullCommand(PlcCmd &cmd) {
   zmq_msg_t msg;
   int rc = zmq_msg_init(&msg);
@@ -100,16 +109,10 @@ int CfgSubscriber::PullCommand(PlcCmd &cmd) {
   content = std::string((char *)zmq_msg_data(&msg));
   zmq_msg_close(&msg);
 
-  std::istringstream ifs(content);
-  boost::archive::text_iarchive ia(ifs);
-  ia >> cmd;
+  UNSERIALIZE_CFG(cmd);
 
   // reply
-  zmq_msg_t reply;
-  zmq_msg_init_size(&reply, strlen("Received"));
-  memcpy(zmq_msg_data(&reply), "Received", strlen("Received"));
-  rc = zmq_msg_send(&reply, responder_, 0);
-  return rc;
+  return SendMessage(responder_, "Received", 0);
 }
 
 int CfgSubscriber::UpdatePlcCfg(PlcCfg &plc_cfg) {
@@ -118,9 +121,7 @@ int CfgSubscriber::UpdatePlcCfg(PlcCfg &plc_cfg) {
   std::string content;
   int rc = ZmqRecvx(plc_subscriber_, identity, layer_str, content); 
   if (rc == 3) {
-    std::istringstream ifs(content);
-    boost::archive::text_iarchive ia(ifs);
-    ia >> plc_cfg;
+    UNSERIALIZE_CFG(plc_cfg);
     plc_cfg.Show();
     received_something_ = true;
   } else if (rc < 0) {
@@ -138,11 +139,11 @@ int CfgSubscriber::UpdateGasCfg(std::vector<GasCfg> &gas_cfg) {
   int rc = ZmqRecvx(gas_subscriber_, identity, layer_str, content);
 
   if (rc == 3) {
-    std::istringstream ifs(content);
-    boost::archive::text_iarchive ia(ifs);
     int layer = atoi(layer_str.c_str());
     assert(layer < gas_cfg.size());
-    ia >> gas_cfg[layer];
+
+    UNSERIALIZE_CFG(gas_cfg[layer]);
+
     gas_cfg[layer].Show();
     received_something_ = true;
   } else if (rc < 0) {
@@ -161,11 +162,11 @@ int CfgSubscriber::UpdateFollowerCfg(std::vector<FollowerCfg> &follower_cfg) {
   int rc = ZmqRecvx(lhc_subscriber_, identity, layer_str, content);
 
   if (rc == 3) {
-    std::istringstream ifs(content);
-    boost::archive::text_iarchive ia(ifs);
     int layer = atoi(layer_str.c_str());
     assert(layer < follower_cfg.size());
-    ia >> follower_cfg[layer];
+
+    UNSERIALIZE_CFG(follower_cfg[layer]);
+
     follower_cfg[layer].Show();
     received_something_ = true;
   } else if (rc < 0) {
@@ -179,11 +180,26 @@ int CfgSubscriber::UpdateFollowerCfg(std::vector<FollowerCfg> &follower_cfg) {
 int CfgSubscriber::AckAnyReceived() {
   if (received_something_) {
     received_something_ = false;
-    zmq_msg_t reply;
-    zmq_msg_init_size(&reply, strlen("Received"));
-    memcpy(zmq_msg_data(&reply), "Received", strlen("Received"));
-    int rc = zmq_msg_send(&reply, ack_responder_, 0);
-    return rc;
+    return SendMessage(ack_responder_, "Received", 0);
   }
   return 0;
+}
+
+int CfgSubscriber::UpdateTaskStatus(const TaskStatus &task_status) {
+  std::ostringstream ofs;
+  boost::archive::text_oarchive oa(ofs);
+  oa << task_status;
+
+  const std::string &content = ofs.str();
+  return SendMessage(status_publisher_, content.c_str(), 0);
+}
+
+int CfgSubscriber::SendMessage(void *socket, const char *content, int flags) {
+  zmq_msg_t msg;
+  zmq_msg_init_size(&msg, strlen(content));
+  memcpy(zmq_msg_data(&msg), content, strlen(content));
+  int size = zmq_msg_send(&msg, socket, flags);
+  assert(size >= 0);
+  zmq_msg_close(&msg);
+  return size;
 }
