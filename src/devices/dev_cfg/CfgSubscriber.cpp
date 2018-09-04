@@ -8,7 +8,7 @@
 
 CfgSubscriber::CfgSubscriber(): gas_subscriber_(NULL), lhc_subscriber_(NULL),
     plc_subscriber_(NULL), responder_(NULL), context_(NULL), 
-    received_something_(false) {}
+    received_cfg_(false), cfg_socket_connected_(false) {}
 
 CfgSubscriber::~CfgSubscriber() {
   zmq_close(gas_subscriber_);
@@ -123,11 +123,11 @@ int CfgSubscriber::UpdatePlcCfg(PlcCfg &plc_cfg) {
   if (rc == 3) {
     UNSERIALIZE_CFG(plc_cfg);
     plc_cfg.Show();
-    received_something_ = true;
+    received_cfg_ = true;
   } else if (rc < 0) {
     return -1;
   } else if (rc != 0) {
-    received_something_ = true;
+    received_cfg_ = true;
   }
   return 0;
 }
@@ -145,11 +145,11 @@ int CfgSubscriber::UpdateGasCfg(std::vector<GasCfg> &gas_cfg) {
     UNSERIALIZE_CFG(gas_cfg[layer]);
 
     gas_cfg[layer].Show();
-    received_something_ = true;
+    received_cfg_ = true;
   } else if (rc < 0) {
     return -1;
   } else if (rc != 0) {
-    received_something_ = true;
+    received_cfg_ = true;
   }
   return 0;
 }
@@ -168,19 +168,22 @@ int CfgSubscriber::UpdateFollowerCfg(std::vector<FollowerCfg> &follower_cfg) {
     UNSERIALIZE_CFG(follower_cfg[layer]);
 
     follower_cfg[layer].Show();
-    received_something_ = true;
+    received_cfg_ = true;
   } else if (rc < 0) {
     return -1;
   } else if (rc != 0) {
-    received_something_ = true;
+    received_cfg_ = true;
   }
   return 0;
 }
 
-int CfgSubscriber::AckAnyReceived() {
-  if (received_something_) {
-    received_something_ = false;
-    return SendMessage(ack_responder_, "Received", 0);
+int CfgSubscriber::AckCfgReceived() {
+  if (!cfg_socket_connected_) {
+    if (received_cfg_) {
+      received_cfg_ = false;
+      cfg_socket_connected_ = true;
+      return SendMessage(ack_responder_, "Received", 0);
+    }
   }
   return 0;
 }

@@ -1158,6 +1158,8 @@ int main(int argc, char **argv)
 		static long pcntr = NML_STAT_ERR_DISPLAY_CNTR;
 
 		ret = get_interpState();	// "peek" NML channels for status & error
+    // task status report
+    UpdateTaskStatus();
 		switch (ret) {
 
 		case UI_EMC_INTERP_ERROR:
@@ -1265,8 +1267,6 @@ prompt_again:
 			prerr("Unkown UI_INTERP_STATE\n");
 			goto exit;
 		}
-    // task status report
-    UpdateTaskStatus();
 
 	}			// while(!done)
 

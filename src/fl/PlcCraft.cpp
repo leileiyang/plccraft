@@ -308,7 +308,7 @@ void PlcCraft::UpdateDeviceCfg() {
   cfg_subscriber_.UpdateGasCfg(gas_cfg_);
   cfg_subscriber_.UpdateFollowerCfg(follower_cfg_);
   cfg_subscriber_.UpdatePlcCfg(job_loader_.plc_cfg_);
-  cfg_subscriber_.AckAnyReceived();
+  cfg_subscriber_.AckCfgReceived();
 }
 
 int PlcCraft::PullCommand(PlcCmd &cmd) {

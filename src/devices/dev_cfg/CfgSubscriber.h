@@ -19,7 +19,7 @@ class CfgSubscriber {
   int UpdatePlcCfg(PlcCfg &plc_cfg);
   int UpdateFollowerCfg(std::vector<FollowerCfg> &follower_cfg);
   int UpdateTaskStatus(const TaskStatus &task_status);
-  int AckAnyReceived();
+  int AckCfgReceived();
 
   int PullCommand(PlcCmd &cmd);
 
@@ -34,7 +34,8 @@ class CfgSubscriber {
   void *responder_;
 
   void *context_;
-  bool received_something_;
+  bool received_cfg_;
+  bool cfg_socket_connected_;
 
   int ZmqRecvx(void *socket, std::string &identify, std::string &layer,
       std::string &content);
